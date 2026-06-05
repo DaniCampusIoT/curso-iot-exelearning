@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="es">
+<head>
+<link rel="stylesheet" type="text/css" href="base.css" />
+<link rel="stylesheet" type="text/css" href="content.css" />
+<link rel="stylesheet" type="text/css" href="nav.css" />
+<meta http-equiv="content-type" content="text/html;  charset=utf-8" />
+<title>Guía didáctica | Estación meteorológica IoT con ESP8266, BMP280 y MQTT </title>
+<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+<meta name="author" content="Daniel Rodríguez Carrión" />
+<link rel="license" type="text/html" href="http://creativecommons.org/licenses/by-sa/4.0/" />
+<meta name="generator" content="eXeLearning 2.9 - exelearning.net" />
+<!--[if lt IE 9]><script type="text/javascript" src="exe_html5.js"></script><![endif]-->
+<script type="text/javascript" src="exe_jquery.js"></script>
+<script type="text/javascript" src="common_i18n.js"></script>
+<script type="text/javascript" src="common.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* ESTILOS PARA COPIAR EN EL EDITOR DE EXELEARNING */
+        .container-header-iot {
+            --color-unam-azul: #0a2558;
+            --color-unam-cian: #009ca6;
+            --bg-gradient: linear-gradient(135deg, var(--color-unam-azul) 0%, #1a3a7a 50%, var(--color-unam-cian) 100%);
+            
+            width: 100%;
+            margin: 0 auto 25px auto;
+            background: var(--bg-gradient);
+            border-radius: 15px;
+            overflow: hidden;
+            color: white;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            box-shadow: 0 10px 30px rgba(0, 156, 166, 0.25);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-top {
+            display: flex;
+            padding: 30px 40px;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-info {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .header-info .subject {
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #b3e6ec;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .header-info h1 {
+            margin: 0;
+            font-size: 2.4rem;
+            font-weight: 800;
+            line-height: 1.1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header-info p.tagline {
+            margin: 10px 0 0 0;
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 300;
+        }
+
+        .header-logo-box {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+
+        .header-logo-box:hover {
+            transform: scale(1.03);
+        }
+
+        .header-logo-box img {
+            height: 65px;
+            width: auto;
+            display: block;
+        }
+
+        .header-bottom {
+            background: rgba(0, 0, 0, 0.15);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .tech-stack {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Recuperación de los tags con efectos de hover */
+        .tech-pill {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(4px);
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .tech-pill:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
+        .project-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #e0faff;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Efecto de red de fondo decorativo */
+        .header-pattern {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .header-top { padding: 20px; }
+            .header-bottom { padding: 15px 20px; }
+            .header-info h1 { font-size: 1.8rem; }
+            .header-logo-box img { height: 50px; }
+            .project-meta { width: 100%; justify-content: space-between; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- BLOQUE HTML PARA PEGAR EN EL iDEVICE DE EXELARNING -->
+    <div class="container-header-iot" style="position: relative;">
+        <div class="header-pattern"></div>
+        
+        <div class="header-top">
+            <div class="header-info">
+                <span class="subject">Tecnología e Ingeniería I • Bachillerato</span>
+                <h1>Estación Meteorológica IoT</h1>
+                <p class="tagline">Diseño, Programación y Ética en la Cultura Maker</p>
+                
+                <div class="tech-stack" style="margin-top: 22px;">
+                    <span class="tech-pill">ESP8266</span>
+                    <span class="tech-pill">BMP280</span>
+                    <span class="tech-pill">MQTT / JSON</span>
+                    <span class="tech-pill">Node-RED</span>
+                </div>
+            </div>
+            
+            <div class="header-logo-box">
+                <!-- Enlace actualizado con el logo de la Universidad del Atlántico Medio -->
+                <img src="https://www.universidadatlanticomedio.es/img/logo/UNAM_logo.png" alt="Logotipo Universidad del Atlántico Medio">
+            </div>
+        </div>
+
+        <div class="header-bottom">
+            <div class="project-meta">
+                <div class="meta-item">
+                    <span>📡 <b>Fase:</b> Prototipado y Comunicaciones</span>
+                </div>
+                <div class="meta-item">
+                    <span>💡 <b>Metodología:</b> ABP</span>
+                </div>
+            </div>
+            <div style="font-size: 0.75rem; opacity: 0.7; letter-spacing: 0.5px;">
+                RECURSO EDUCATIVO ABIERTO (REA)
+            </div>
+        </div>
+    </div>
+    <!-- FIN DEL BLOQUE HTML -->
+
+</body>
+</html></head>
+<body class="exe-web-site" id="exe-node-7"><script type="text/javascript">document.body.className+=" js"</script>
+<div id="content">
+<p id="skipNav"><a href="#main" class="sr-av">Saltar la navegación</a></p>
+<header id="header" ><div id="headerContent">Estación meteorológica IoT con ESP8266, BMP280 y MQTT</div></header>
+<nav id="siteNav">
+<ul>
+   <li><a href="index.html" class="daddy main-node">Inicio</a></li>
+   <li id="active"><a href="gua_didctica.html" class="active no-ch">Guía didáctica</a></li>
+   <li><a href="introduccin_al_proyecto.html" class="daddy">Introducción al proyecto</a>
+   <ul class="other-section">
+      <li><a href="fase_1_electrnica_y_soldadura.html" class="no-ch">Fase 1. Electrónica y soldadura</a></li>
+      <li><a href="fase_2_lectura_local_del_sensor.html" class="no-ch">Fase 2. Lectura local del sensor</a></li>
+      <li><a href="fase_3_iot_wifi_mqtt_y_json.html" class="no-ch">Fase 3. IoT, WiFi, MQTT y JSON</a></li>
+      <li><a href="fase_4_envo_de_datos_va_mqtt.html" class="no-ch">Fase 4. Envío de datos vía MQTT</a></li>
+      <li><a href="fase_5_nodered_y_dashboard.html" class="no-ch">Fase 5. Node-RED y dashboard</a></li>
+      <li><a href="fase_6_anlisis_reflexin_y_entrega.html" class="no-ch">Fase 6. Análisis, reflexión y entrega</a></li>
+   </ul>
+   </li>
+   <li><a href="actividades_interactivas.html" class="no-ch">Actividades interactivas</a></li>
+   <li><a href="licencia_autora_y_recursos.html" class="no-ch">Licencia, autoría y recursos</a></li>
+</ul>
+</nav>
+<div id='topPagination'>
+<nav class="pagination noprt">
+<a href="index.html" class="prev"><span><span>&laquo; </span>Anterior</span></a> <span class="sep">| </span><a href="introduccin_al_proyecto.html" class="next"><span>Siguiente<span> &raquo;</span></span></a>
+</nav>
+</div>
+<div id="main-wrapper">
+<section id="main">
+<header id="nodeDecoration"><h1 id="nodeTitle">Guía didáctica</h1></header>
+<article class="iDevice_wrapper textIdevice" id="id3">
+<div class="iDevice emphasis0" >
+<div id="ta3_129_2" class="block iDevice_content">
+<div class="exe-text"><style>
+  .ud-iot{
+    --ud-azul:#0a2558;
+    --ud-azul-2:#143a7b;
+    --ud-cian:#009ca6;
+    --ud-cian-soft:#e4f8f9;
+    --ud-white:#ffffff;
+    --ud-bg:#f4f8fc;
+    --ud-text:#18314f;
+    --ud-muted:#5d7590;
+    --ud-border:rgba(10,37,88,0.10);
+    --ud-shadow:0 12px 28px rgba(10,37,88,0.08);
+    font-family:'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color:var(--ud-text);
+    margin:0 0 30px 0;
+  }
+
+  .ud-iot *{ box-sizing:border-box; }
+
+  .ud-shell{
+    background:linear-gradient(180deg, #f8fbfe 0%, #eef5fb 100%);
+    border:1px solid rgba(10,37,88,0.06);
+    border-radius:22px;
+    padding:26px;
+    box-shadow:var(--ud-shadow);
+  }
+
+  .ud-top{
+    display:grid;
+    grid-template-columns:1.1fr 0.9fr;
+    gap:22px;
+    margin-bottom:22px;
+  }
+
+  .ud-hero{
+    background:linear-gradient(135deg, #0a2558 0%, #143a7b 55%, #009ca6 100%);
+    color:#fff;
+    border-radius:22px;
+    padding:28px;
+    box-shadow:0 16px 34px rgba(0,156,166,0.16);
+    position:relative;
+    overflow:hidden;
+  }
+
+  .ud-hero:before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background-image:radial-gradient(rgba(255,255,255,0.12) 1px, transparent 1px);
+    background-size:18px 18px;
+    opacity:0.55;
+    pointer-events:none;
+  }
+
+  .ud-hero > *{ position:relative; z-index:1; }
+
+  .ud-kicker{
+    display:inline-block;
+    padding:8px 14px;
+    background:rgba(255,255,255,0.12);
+    border:1px solid rgba(255,255,255,0.22);
+    border-radius:999px;
+    font-size:0.78rem;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    margin-bottom:16px;
+  }
+
+  .ud-hero h2{
+    margin:0 0 12px 0;
+    font-size:2rem;
+    line-height:1.08;
+    font-weight:800;
+  }
+
+  .ud-hero p{
+    margin:0;
+    font-size:1rem;
+    line-height:1.7;
+    color:rgba(255,255,255,0.93);
+    max-width:64ch;
+  }
+
+  .ud-side{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+  }
+
+  .ud-stat{
+    background:var(--ud-white);
+    border:1px solid var(--ud-border);
+    border-radius:18px;
+    padding:18px;
+    box-shadow:var(--ud-shadow);
+    transition:transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .ud-stat:hover{
+    transform:translateY(-4px);
+    box-shadow:0 14px 28px rgba(10,37,88,0.12);
+  }
+
+  .ud-stat .label{
+    display:block;
+    font-size:0.76rem;
+    text-transform:uppercase;
+    letter-spacing:0.9px;
+    font-weight:800;
+    color:var(--ud-muted);
+    margin-bottom:8px;
+  }
+
+  .ud-stat .value{
+    display:block;
+    font-size:1.45rem;
+    line-height:1;
+    font-weight:800;
+    color:var(--ud-azul);
+    margin-bottom:6px;
+  }
+
+  .ud-stat .desc{
+    display:block;
+    font-size:0.92rem;
+    line-height:1.45;
+    color:var(--ud-muted);
+  }
+
+  .ud-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:22px;
+  }
+
+  .ud-card{
+    background:var(--ud-white);
+    border:1px solid var(--ud-border);
+    border-radius:20px;
+    padding:22px;
+    box-shadow:var(--ud-shadow);
+  }
+
+  .ud-card h3{
+    margin:0 0 14px 0;
+    color:var(--ud-azul);
+    font-size:1.12rem;
+    font-weight:800;
+  }
+
+  .ud-card p{
+    margin:0 0 12px 0;
+    color:var(--ud-text);
+    line-height:1.65;
+    font-size:0.96rem;
+  }
+
+  .ud-list{
+    display:grid;
+    gap:12px;
+  }
+
+  .ud-item{
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+    background:linear-gradient(180deg, #fbfdff 0%, #f4fbfc 100%);
+    border:1px solid rgba(0,156,166,0.14);
+    border-radius:16px;
+    padding:14px;
+    transition:transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .ud-item:hover{
+    transform:translateX(4px);
+    box-shadow:0 10px 22px rgba(10,37,88,0.08);
+  }
+
+  .ud-dot{
+    width:30px;
+    height:30px;
+    border-radius:50%;
+    background:var(--ud-azul);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:800;
+    flex:0 0 30px;
+    font-size:0.9rem;
+  }
+
+  .ud-item strong{
+    display:block;
+    color:var(--ud-azul);
+    margin-bottom:4px;
+    font-size:0.95rem;
+  }
+
+  .ud-item span{
+    display:block;
+    color:var(--ud-muted);
+    font-size:0.92rem;
+    line-height:1.45;
+  }
+
+  .ud-tags{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:8px;
+  }
+
+  .ud-tag{
+    background:var(--ud-cian-soft);
+    color:var(--ud-azul);
+    border-radius:999px;
+    padding:7px 12px;
+    font-size:0.78rem;
+    font-weight:700;
+    transition:transform 0.24s ease, box-shadow 0.24s ease, background-color 0.24s ease;
+  }
+
+  .ud-tag:hover{
+    transform:translateY(-3px);
+    background:#cff1f3;
+    box-shadow:0 8px 16px rgba(0,156,166,0.12);
+  }
+
+  .ud-wide{
+    margin-top:22px;
+    background:linear-gradient(135deg, #effbfc 0%, #ffffff 100%);
+    border:1px solid rgba(0,156,166,0.16);
+    border-radius:20px;
+    padding:22px;
+    box-shadow:var(--ud-shadow);
+  }
+
+  .ud-wide h3{
+    margin:0 0 12px 0;
+    color:var(--ud-azul);
+    font-size:1.12rem;
+    font-weight:800;
+  }
+
+  .ud-wide p{
+    margin:0;
+    color:var(--ud-text);
+    line-height:1.7;
+    font-size:0.96rem;
+  }
+
+  @media (max-width: 980px){
+    .ud-top,
+    .ud-grid{
+      grid-template-columns:1fr;
+    }
+  }
+
+  @media (max-width: 640px){
+    .ud-shell{ padding:18px; border-radius:18px; }
+    .ud-hero,
+    .ud-card,
+    .ud-stat,
+    .ud-wide{ padding:18px; border-radius:16px; }
+    .ud-side{ grid-template-columns:1fr; }
+    .ud-hero h2{ font-size:1.65rem; }
+  }
+</style>
+<div class="ud-iot">
+<div class="ud-shell">
+<div class="ud-top">
+<div class="ud-hero">
+<div class="ud-kicker">Unidad didáctica</div>
+<h2>Estación meteorológica IoT con ESP8266, BMP280 y MQTT</h2>
+<p>Esta unidad didáctica se dirige a 1.º de Bachillerato en la materia de Tecnología e Ingeniería y propone una experiencia práctica en la que el alumnado diseña, monta, programa y conecta un sistema real de adquisición, transmisión y visualización de datos.</p>
+</div>
+<div class="ud-side">
+<div class="ud-stat"><span class="label">Etapa</span> <span class="value">Bachillerato</span> <span class="desc">1.º de Bachillerato en Tecnología e Ingeniería.</span></div>
+<div class="ud-stat"><span class="label">Duración</span> <span class="value">12–14</span> <span class="desc">Sesiones de 50 minutos aproximadamente.</span></div>
+<div class="ud-stat"><span class="label">Metodología</span> <span class="value">ABP</span> <span class="desc">Aprendizaje basado en proyectos con producto funcional final.</span></div>
+<div class="ud-stat"><span class="label">Producto</span> <span class="value">IoT + Dashboard</span> <span class="desc">Sistema funcional con visualización en Node-RED.</span></div>
+</div>
+</div>
+<div class="ud-grid">
+<div class="ud-card">
+<h3>Finalidad didáctica</h3>
+<p>La propuesta introduce al alumnado en el Internet de las Cosas mediante un proyecto técnico real, accesible y reutilizable. El objetivo no es solo comprender el IoT desde la teoría, sino construir, programar y conectar un dispositivo funcional que permita trabajar con datos reales del entorno.</p>
+<p>La secuencia avanza desde la electrónica básica y la lectura local del sensor hasta la comunicación mediante MQTT y la visualización de datos con Node-RED, lo que favorece una progresión coherente entre montaje, comprensión y aplicación.</p>
+</div>
+<div class="ud-card">
+<h3>Temporalización</h3>
+<div class="ud-list">
+<div class="ud-item">
+<div class="ud-dot">1</div>
+<div><strong>Fases 1 y 2</strong> <span>Electrónica, soldadura, montaje del circuito y lectura local del sensor BMP280.</span></div>
+</div>
+<div class="ud-item">
+<div class="ud-dot">2</div>
+<div><strong>Fases 3 y 4</strong> <span>Introducción al IoT, red WiFi, protocolo MQTT, JSON y envío de datos.</span></div>
+</div>
+<div class="ud-item">
+<div class="ud-dot">3</div>
+<div><strong>Fases 5 y 6</strong> <span>Construcción del dashboard en Node-RED, análisis de resultados, reflexión y entrega final.</span></div>
+</div>
+</div>
+</div>
+<div class="ud-card">
+<h3>Objetivos didácticos</h3>
+<div class="ud-list">
+<div class="ud-item">
+<div class="ud-dot">✓</div>
+<div><strong>Montar y comprobar el sistema</strong> <span>Identificar componentes electrónicos y ensamblar el circuito con seguridad.</span></div>
+</div>
+<div class="ud-item">
+<div class="ud-dot">✓</div>
+<div><strong>Leer y depurar datos</strong> <span>Trabajar con Arduino IDE, monitor serie e I2C para obtener lecturas reales.</span></div>
+</div>
+<div class="ud-item">
+<div class="ud-dot">✓</div>
+<div><strong>Comprender la arquitectura IoT</strong> <span>Relacionar sensor, microcontrolador, red, broker y visualización.</span></div>
+</div>
+<div class="ud-item">
+<div class="ud-dot">✓</div>
+<div><strong>Visualizar y reflexionar</strong> <span>Representar datos en Node-RED y analizar implicaciones éticas y de sostenibilidad.</span></div>
+</div>
+</div>
+</div>
+<div class="ud-card">
+<h3>Contenidos y competencias</h3>
+<p>La unidad trabaja electrónica y sistemas embebidos, programación con Arduino IDE, comunicaciones WiFi, MQTT y JSON, además del tratamiento y visualización de datos con Node-RED.</p>
+<p>Se desarrollan competencias vinculadas a la competencia digital, el pensamiento computacional, la resolución de problemas tecnológicos y la interpretación de datos empíricos.</p>
+<div class="ud-tags"><span class="ud-tag">Electrónica</span> <span class="ud-tag">Arduino IDE</span> <span class="ud-tag">I2C</span> <span class="ud-tag">MQTT</span> <span class="ud-tag">JSON</span> <span class="ud-tag">Node-RED</span> <span class="ud-tag">Competencia digital</span> <span class="ud-tag">Pensamiento computacional</span></div>
+</div>
+</div>
+<div class="ud-wide">
+<h3>Enfoque metodológico</h3>
+<p>La unidad se apoya en el Aprendizaje Basado en Proyectos, una metodología que sitúa al alumnado ante un reto tecnológico real y promueve la integración de teoría y práctica mediante la construcción de prototipos, la resolución de problemas y la toma de decisiones fundamentadas. Este enfoque resulta especialmente adecuado para trabajar IoT en contextos escolares, ya que favorece la creatividad, la autonomía, la competencia digital y la comprensión aplicada de los sistemas tecnológicos.</p>
+</div>
+</div>
+</div></div>
+</div>
+</div>
+</article>
+<div id="packageLicense" class="cc cc-by-sa">
+<p><span>Obra publicada con</span> <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Licencia Creative Commons Reconocimiento Compartir igual 4.0</a></p>
+</div>
+</section>
+</div>
+<div id='bottomPagination'>
+<nav class="pagination noprt">
+<a href="index.html" class="prev"><span><span>&laquo; </span>Anterior</span></a> <span class="sep">| </span><a href="introduccin_al_proyecto.html" class="next"><span>Siguiente<span> &raquo;</span></span></a>
+</nav>
+</div>
+<footer id="siteFooter">Daniel Rodríguez Carrión | REA para Tecnología e Ingeniería | Curso 2025-2026 | Licencia CC </footer></div>
+<p id="made-with-eXe"><a href="https://exelearning.net/" target="_blank" rel="noopener"><span>Creado con eXeLearning<span> (Ventana nueva)</span></span></a></p><script type="text/javascript" src="_intef_js.js"></script></body></html>
