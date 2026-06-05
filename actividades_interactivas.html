@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="es">
+<head>
+<link rel="stylesheet" type="text/css" href="base.css" />
+<link rel="stylesheet" type="text/css" href="content.css" />
+<link rel="stylesheet" type="text/css" href="nav.css" />
+<meta http-equiv="content-type" content="text/html;  charset=utf-8" />
+<title>Actividades interactivas | Estación meteorológica IoT con ESP8266, BMP280 y MQTT </title>
+<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+<meta name="author" content="Daniel Rodríguez Carrión" />
+<link rel="license" type="text/html" href="http://creativecommons.org/licenses/by-sa/4.0/" />
+<meta name="generator" content="eXeLearning 2.9 - exelearning.net" />
+<!--[if lt IE 9]><script type="text/javascript" src="exe_html5.js"></script><![endif]-->
+<script type="text/javascript" src="exe_jquery.js"></script>
+<script type="text/javascript" src="common_i18n.js"></script>
+<script type="text/javascript" src="common.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* ESTILOS PARA COPIAR EN EL EDITOR DE EXELEARNING */
+        .container-header-iot {
+            --color-unam-azul: #0a2558;
+            --color-unam-cian: #009ca6;
+            --bg-gradient: linear-gradient(135deg, var(--color-unam-azul) 0%, #1a3a7a 50%, var(--color-unam-cian) 100%);
+            
+            width: 100%;
+            margin: 0 auto 25px auto;
+            background: var(--bg-gradient);
+            border-radius: 15px;
+            overflow: hidden;
+            color: white;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            box-shadow: 0 10px 30px rgba(0, 156, 166, 0.25);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-top {
+            display: flex;
+            padding: 30px 40px;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-info {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .header-info .subject {
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #b3e6ec;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .header-info h1 {
+            margin: 0;
+            font-size: 2.4rem;
+            font-weight: 800;
+            line-height: 1.1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header-info p.tagline {
+            margin: 10px 0 0 0;
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 300;
+        }
+
+        .header-logo-box {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+
+        .header-logo-box:hover {
+            transform: scale(1.03);
+        }
+
+        .header-logo-box img {
+            height: 65px;
+            width: auto;
+            display: block;
+        }
+
+        .header-bottom {
+            background: rgba(0, 0, 0, 0.15);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .tech-stack {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Recuperación de los tags con efectos de hover */
+        .tech-pill {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(4px);
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .tech-pill:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
+        .project-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #e0faff;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Efecto de red de fondo decorativo */
+        .header-pattern {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .header-top { padding: 20px; }
+            .header-bottom { padding: 15px 20px; }
+            .header-info h1 { font-size: 1.8rem; }
+            .header-logo-box img { height: 50px; }
+            .project-meta { width: 100%; justify-content: space-between; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- BLOQUE HTML PARA PEGAR EN EL iDEVICE DE EXELARNING -->
+    <div class="container-header-iot" style="position: relative;">
+        <div class="header-pattern"></div>
+        
+        <div class="header-top">
+            <div class="header-info">
+                <span class="subject">Tecnología e Ingeniería I • Bachillerato</span>
+                <h1>Estación Meteorológica IoT</h1>
+                <p class="tagline">Diseño, Programación y Ética en la Cultura Maker</p>
+                
+                <div class="tech-stack" style="margin-top: 22px;">
+                    <span class="tech-pill">ESP8266</span>
+                    <span class="tech-pill">BMP280</span>
+                    <span class="tech-pill">MQTT / JSON</span>
+                    <span class="tech-pill">Node-RED</span>
+                </div>
+            </div>
+            
+            <div class="header-logo-box">
+                <!-- Enlace actualizado con el logo de la Universidad del Atlántico Medio -->
+                <img src="https://www.universidadatlanticomedio.es/img/logo/UNAM_logo.png" alt="Logotipo Universidad del Atlántico Medio">
+            </div>
+        </div>
+
+        <div class="header-bottom">
+            <div class="project-meta">
+                <div class="meta-item">
+                    <span>📡 <b>Fase:</b> Prototipado y Comunicaciones</span>
+                </div>
+                <div class="meta-item">
+                    <span>💡 <b>Metodología:</b> ABP</span>
+                </div>
+            </div>
+            <div style="font-size: 0.75rem; opacity: 0.7; letter-spacing: 0.5px;">
+                RECURSO EDUCATIVO ABIERTO (REA)
+            </div>
+        </div>
+    </div>
+    <!-- FIN DEL BLOQUE HTML -->
+
+</body>
+</html></head>
+<body class="exe-web-site" id="exe-node-15"><script type="text/javascript">document.body.className+=" js"</script>
+<div id="content">
+<p id="skipNav"><a href="#main" class="sr-av">Saltar la navegación</a></p>
+<header id="header" ><div id="headerContent">Estación meteorológica IoT con ESP8266, BMP280 y MQTT</div></header>
+<nav id="siteNav">
+<ul>
+   <li><a href="index.html" class="daddy main-node">Inicio</a></li>
+   <li><a href="gua_didctica.html" class="no-ch">Guía didáctica</a></li>
+   <li><a href="introduccin_al_proyecto.html" class="daddy">Introducción al proyecto</a>
+   <ul class="other-section">
+      <li><a href="fase_1_electrnica_y_soldadura.html" class="no-ch">Fase 1. Electrónica y soldadura</a></li>
+      <li><a href="fase_2_lectura_local_del_sensor.html" class="no-ch">Fase 2. Lectura local del sensor</a></li>
+      <li><a href="fase_3_iot_wifi_mqtt_y_json.html" class="no-ch">Fase 3. IoT, WiFi, MQTT y JSON</a></li>
+      <li><a href="fase_4_envo_de_datos_va_mqtt.html" class="no-ch">Fase 4. Envío de datos vía MQTT</a></li>
+      <li><a href="fase_5_nodered_y_dashboard.html" class="no-ch">Fase 5. Node-RED y dashboard</a></li>
+      <li><a href="fase_6_anlisis_reflexin_y_entrega.html" class="no-ch">Fase 6. Análisis, reflexión y entrega</a></li>
+   </ul>
+   </li>
+   <li id="active"><a href="actividades_interactivas.html" class="active no-ch">Actividades interactivas</a></li>
+   <li><a href="licencia_autora_y_recursos.html" class="no-ch">Licencia, autoría y recursos</a></li>
+</ul>
+</nav>
+<div id='topPagination'>
+<nav class="pagination noprt">
+<a href="fase_6_anlisis_reflexin_y_entrega.html" class="prev"><span><span>&laquo; </span>Anterior</span></a> <span class="sep">| </span><a href="licencia_autora_y_recursos.html" class="next"><span>Siguiente<span> &raquo;</span></span></a>
+</nav>
+</div>
+<div id="main-wrapper">
+<section id="main">
+<header id="nodeDecoration"><h1 id="nodeTitle">Actividades interactivas</h1></header>
+<article class="iDevice_wrapper textIdevice" id="id20">
+<div class="iDevice emphasis0" >
+<div id="ta20_146_2" class="block iDevice_content">
+<div class="exe-text"><style>
+  :root {
+    --az:#0a2558; --az2:#143a7b; --az3:#1a4a9a;
+    --ve:#1a7a4a; --ve-soft:#edf7f1;
+    --ro:#c0392b; --ro-soft:#fdf0ee;
+    --ci:#009ca6; --ci-soft:#e6f8f9;
+    --na:#d97a00; --na-soft:#fef8ee;
+    --bg:#f4f8fc; --wh:#ffffff;
+    --tx:#18314f; --mt:#5d7690;
+    --bd:rgba(10,37,88,0.10);
+    --sh:0 8px 24px rgba(10,37,88,0.08);
+    --gold:#b8860b; --gold-soft:#fefae8;
+  }
+  .act, .act * { box-sizing:border-box !important; }
+  .act { font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif; color:var(--tx); margin:0 0 30px 0; }
+  .act-shell { background:linear-gradient(180deg,#f8fbfe,#eef5fb); border:1px solid rgba(10,37,88,0.06); border-radius:22px; padding:26px; box-shadow:var(--sh); }
+
+  /* HERO */
+  .act-hero { background:linear-gradient(135deg,#0a4a2a 0%,#009ca6 100%); border-radius:20px; padding:26px 28px; margin-bottom:26px; position:relative; overflow:hidden; box-shadow:0 14px 32px rgba(10,37,88,0.18); }
+  .act-hero:before { content:""; position:absolute; inset:0; background-image:radial-gradient(rgba(255,255,255,0.08) 1px,transparent 1px); background-size:18px 18px; pointer-events:none; }
+  .act-hero > * { position:relative; z-index:1; }
+  .act-hero-kicker { display:inline-block !important; padding:6px 14px; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); border-radius:999px; font-size:0.76rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:#fff; margin-bottom:12px; }
+  .act-hero h2 { margin:0 0 8px 0; font-size:1.6rem; line-height:1.15; font-weight:800; color:#fff; }
+  .act-hero p { margin:0; font-size:0.93rem; line-height:1.65; color:rgba(255,255,255,0.88); max-width:660px; }
+
+  /* BLOQUE ACTIVIDAD */
+  .act-block { background:var(--wh); border:1px solid var(--bd); border-radius:20px; padding:24px; margin-bottom:20px; box-shadow:var(--sh); }
+  .act-block-header { display:flex !important; align-items:center; gap:14px; margin-bottom:20px; padding-bottom:14px; border-bottom:2px solid rgba(10,37,88,0.07); }
+  .act-num { width:44px; height:44px; border-radius:14px; display:flex !important; align-items:center; justify-content:center; font-size:1.25rem; font-weight:900; color:#fff; flex-shrink:0; }
+  .act-num-1 { background:linear-gradient(135deg,#009ca6,#0a2558); }
+  .act-num-2 { background:linear-gradient(135deg,#1a7a4a,#0a2558); }
+  .act-num-3 { background:linear-gradient(135deg,#d97a00,#0a2558); }
+  .act-block-title { font-size:1.08rem; font-weight:800; color:var(--az); margin:0 0 3px 0; }
+  .act-block-sub { font-size:0.82rem; color:var(--mt); }
+  .act-tipo { display:inline-block !important; padding:3px 10px; border-radius:999px; font-size:0.74rem; font-weight:800; margin-top:5px; }
+  .act-tipo-1 { background:var(--ci-soft); color:var(--ci); border:1px solid rgba(0,156,166,0.25); }
+  .act-tipo-2 { background:var(--ve-soft); color:var(--ve); border:1px solid rgba(26,122,74,0.25); }
+  .act-tipo-3 { background:var(--na-soft); color:var(--na); border:1px solid rgba(217,122,0,0.25); }
+
+  /* INSTRUCCIÓN */
+  .act-instruccion { background:linear-gradient(90deg,var(--ci-soft),#f0fbff); border-left:4px solid var(--ci); border-radius:0 12px 12px 0; padding:12px 16px; font-size:0.9rem; color:var(--tx); line-height:1.6; margin-bottom:20px; }
+  .act-instruccion strong { color:var(--az); }
+
+  /* ─── ACTIVIDAD 1: ELECCIÓN MÚLTIPLE ─── */
+  .quiz-form { display:grid; gap:16px; }
+  .quiz-q { background:var(--bg); border:1px solid var(--bd); border-radius:14px; padding:16px 18px; }
+  .quiz-q-text { font-size:0.93rem; font-weight:700; color:var(--az); margin-bottom:12px; line-height:1.45; }
+  .quiz-q-num { display:inline-block !important; background:var(--az); color:#fff; border-radius:999px; font-size:0.72rem; font-weight:800; padding:2px 9px; margin-right:8px; vertical-align:middle; }
+  .quiz-options { display:grid; gap:8px; }
+  .quiz-opt-label { display:flex !important; align-items:center; gap:10px; padding:9px 14px; border-radius:10px; border:1px solid var(--bd); background:var(--wh); cursor:pointer; font-size:0.88rem; color:var(--tx); transition:background 0.15s,border-color 0.15s; }
+  .quiz-opt-label:hover { background:var(--ci-soft); border-color:var(--ci); }
+  .quiz-opt-label input[type=radio] { accent-color:var(--ci); width:16px; height:16px; flex-shrink:0; }
+  .quiz-opt-label.correct { background:#d4edda; border-color:#1a7a4a; color:#1a7a4a; font-weight:700; }
+  .quiz-opt-label.incorrect { background:var(--ro-soft); border-color:var(--ro); color:var(--ro); }
+  .quiz-feedback { display:none; font-size:0.82rem; margin-top:8px; padding:8px 12px; border-radius:8px; font-weight:700; }
+  .quiz-feedback.ok { display:block; background:#d4edda; color:#1a7a4a; border:1px solid rgba(26,122,74,0.3); }
+  .quiz-feedback.ko { display:block; background:var(--ro-soft); color:var(--ro); border:1px solid rgba(192,57,43,0.2); }
+  .quiz-btn { display:inline-flex !important; width:fit-content !important; margin-top:18px; padding:10px 24px; background:linear-gradient(135deg,var(--az),var(--az3)); color:#fff; border:none; border-radius:999px; font-size:0.88rem; font-weight:800; cursor:pointer; transition:transform 0.15s,box-shadow 0.15s; }
+  .quiz-btn:hover { transform:translateY(-2px); box-shadow:0 8px 18px rgba(10,37,88,0.2); }
+  .quiz-score { margin-top:14px; padding:14px 18px; border-radius:14px; font-size:0.95rem; font-weight:800; display:none; }
+  .quiz-score.show { display:block; }
+  .quiz-score.perfect { background:#d4edda; color:#1a7a4a; border:1px solid rgba(26,122,74,0.3); }
+  .quiz-score.good { background:var(--gold-soft); color:var(--gold); border:1px solid rgba(184,134,11,0.3); }
+  .quiz-score.low { background:var(--ro-soft); color:var(--ro); border:1px solid rgba(192,57,43,0.2); }
+
+  /* ─── ACTIVIDAD 2: RELLENAR HUECOS ─── */
+  .gaps-text { font-size:0.95rem; line-height:2.2; color:var(--tx); background:var(--bg); border:1px solid var(--bd); border-radius:14px; padding:20px 22px; margin-bottom:16px; }
+  .gap-input { display:inline-block !important; border:none; border-bottom:2px solid var(--ci); background:rgba(0,156,166,0.07); border-radius:6px 6px 0 0; padding:2px 8px; font-size:0.92rem; font-family:inherit; color:var(--az); font-weight:700; min-width:110px; text-align:center; outline:none; transition:border-color 0.15s,background 0.15s; }
+  .gap-input:focus { border-color:var(--az); background:rgba(10,37,88,0.07); }
+  .gap-input.gap-ok { border-color:var(--ve); background:#d4edda; color:var(--ve); }
+  .gap-input.gap-ko { border-color:var(--ro); background:var(--ro-soft); color:var(--ro); }
+  .gaps-hint { font-size:0.82rem; color:var(--mt); margin-bottom:14px; }
+  .gaps-hint strong { color:var(--az); }
+  .gaps-word-bank { display:flex !important; flex-wrap:wrap; gap:8px; margin-bottom:18px; padding:14px 16px; background:linear-gradient(90deg,#f0fbff,var(--ci-soft)); border:1px solid rgba(0,156,166,0.2); border-radius:12px; }
+  .gap-word { display:inline-block !important; padding:5px 13px; background:var(--wh); border:1px solid var(--bd); border-radius:999px; font-size:0.83rem; font-weight:700; color:var(--az); cursor:pointer; transition:background 0.15s,transform 0.12s; user-select:none; }
+  .gap-word:hover { background:var(--ci-soft); border-color:var(--ci); transform:translateY(-1px); }
+  .gap-word.used { opacity:0.35; pointer-events:none; text-decoration:line-through; }
+  .gaps-btn-row { display:flex !important; gap:10px; flex-wrap:wrap; }
+  .gaps-btn { display:inline-flex !important; width:fit-content !important; padding:9px 22px; border:none; border-radius:999px; font-size:0.87rem; font-weight:800; cursor:pointer; transition:transform 0.15s,box-shadow 0.15s; }
+  .gaps-btn-check { background:linear-gradient(135deg,var(--ve),#0a4a2a); color:#fff; }
+  .gaps-btn-reset { background:var(--bg); color:var(--mt); border:1px solid var(--bd); }
+  .gaps-btn:hover { transform:translateY(-2px); box-shadow:0 8px 16px rgba(10,37,88,0.15); }
+  .gaps-result { display:none; margin-top:14px; padding:12px 16px; border-radius:12px; font-size:0.9rem; font-weight:700; }
+  .gaps-result.show { display:block; }
+  .gaps-result.ok { background:#d4edda; color:var(--ve); border:1px solid rgba(26,122,74,0.3); }
+  .gaps-result.ko { background:var(--ro-soft); color:var(--ro); border:1px solid rgba(192,57,43,0.2); }
+
+  /* ─── ACTIVIDAD 3: LISTA DESORDENADA ─── */
+  .order-list { display:grid; gap:8px; margin-bottom:18px; }
+  .order-item { display:flex !important; align-items:center; gap:12px; padding:11px 16px; background:var(--bg); border:1px solid var(--bd); border-radius:12px; font-size:0.9rem; color:var(--tx); cursor:grab; transition:background 0.15s,box-shadow 0.15s,transform 0.12s; user-select:none; }
+  .order-item:hover { background:var(--ci-soft); border-color:var(--ci); }
+  .order-item.dragging { opacity:0.45; transform:scale(0.97); box-shadow:0 8px 20px rgba(10,37,88,0.15); }
+  .order-item.over { border-color:var(--az); background:rgba(10,37,88,0.06); }
+  .order-item.order-ok { background:#d4edda; border-color:var(--ve); }
+  .order-item.order-ko { background:var(--ro-soft); border-color:var(--ro); }
+  .order-drag-icon { font-size:1rem; color:var(--mt); flex-shrink:0; }
+  .order-pos { width:24px; height:24px; border-radius:50%; background:var(--az); color:#fff; font-size:0.75rem; font-weight:800; display:flex !important; align-items:center; justify-content:center; flex-shrink:0; }
+  .order-item.order-ok .order-pos { background:var(--ve); }
+  .order-item.order-ko .order-pos { background:var(--ro); }
+  .order-item-text { flex:1; line-height:1.4; }
+  .order-item-phase { display:inline-block !important; font-size:0.72rem; font-weight:800; padding:2px 8px; border-radius:999px; margin-left:6px; vertical-align:middle; }
+  .order-phase4 { background:rgba(0,156,166,0.12); color:var(--ci); }
+  .order-phase5 { background:rgba(26,122,74,0.12); color:var(--ve); }
+  .order-btn-row { display:flex !important; gap:10px; flex-wrap:wrap; }
+  .order-btn { display:inline-flex !important; width:fit-content !important; padding:9px 22px; border:none; border-radius:999px; font-size:0.87rem; font-weight:800; cursor:pointer; transition:transform 0.15s,box-shadow 0.15s; }
+  .order-btn-check { background:linear-gradient(135deg,var(--na),#a05000); color:#fff; }
+  .order-btn-shuffle { background:var(--bg); color:var(--mt); border:1px solid var(--bd); }
+  .order-btn:hover { transform:translateY(-2px); box-shadow:0 8px 16px rgba(10,37,88,0.15); }
+  .order-result { display:none; margin-top:14px; padding:12px 16px; border-radius:12px; font-size:0.9rem; font-weight:700; }
+  .order-result.show { display:block; }
+  .order-result.ok { background:#d4edda; color:var(--ve); border:1px solid rgba(26,122,74,0.3); }
+  .order-result.partial { background:var(--gold-soft); color:var(--gold); border:1px solid rgba(184,134,11,0.3); }
+  .order-result.ko { background:var(--ro-soft); color:var(--ro); border:1px solid rgba(192,57,43,0.2); }
+</style>
+<div class="act">
+<div class="act-shell"><!-- HERO -->
+<div class="act-hero"><span class="act-hero-kicker">🧪 Actividades interactivas · Fases 4 y 5</span>
+<h2>Pon a prueba lo aprendido</h2>
+<p>Tres actividades para consolidar los conceptos clave del envío de datos por MQTT, el formato JSON y la visualización en tiempo real con Node-RED.</p>
+</div>
+<!-- ══════════════════════════════════ --> <!-- ACTIVIDAD 1: ELECCIÓN MÚLTIPLE    --> <!-- ══════════════════════════════════ -->
+<div class="act-block">
+<div class="act-block-header">
+<div class="act-num act-num-1">1</div>
+<div>
+<div class="act-block-title">¿Sabes cómo viajan los datos?</div>
+<div class="act-block-sub">Elige la respuesta correcta en cada pregunta</div>
+<span class="act-tipo act-tipo-1">Elección múltiple</span></div>
+</div>
+<div class="act-instruccion"><strong>Instrucciones:</strong> selecciona la opción correcta en cada pregunta y pulsa <em>Comprobar respuestas</em> al terminar.</div>
+<div class="quiz-form" id="quiz1">
+<div class="quiz-q" data-correct="b">
+<div class="quiz-q-text"><span class="quiz-q-num">1</span>¿En qué formato envía el ESP8266 los datos del sensor por MQTT?</div>
+<div class="quiz-options"><label class="quiz-opt-label"><input type="radio" name="q1" value="a" /> CSV (valores separados por comas)</label> <label class="quiz-opt-label"><input type="radio" name="q1" value="b" /> JSON (JavaScript Object Notation)</label> <label class="quiz-opt-label"><input type="radio" name="q1" value="c" /> XML (eXtensible Markup Language)</label> <label class="quiz-opt-label"><input type="radio" name="q1" value="d" /> Texto plano sin estructura</label></div>
+<div class="quiz-feedback" id="fb-q1"></div>
+</div>
+<div class="quiz-q" data-correct="a">
+<div class="quiz-q-text"><span class="quiz-q-num">2</span>¿Qué nodo de Node-RED recibe los mensajes del broker MQTT?</div>
+<div class="quiz-options"><label class="quiz-opt-label"><input type="radio" name="q2" value="a" /> mqtt in</label> <label class="quiz-opt-label"><input type="radio" name="q2" value="b" /> http in</label> <label class="quiz-opt-label"><input type="radio" name="q2" value="c" /> inject</label> <label class="quiz-opt-label"><input type="radio" name="q2" value="d" /> debug</label></div>
+<div class="quiz-feedback" id="fb-q2"></div>
+</div>
+<div class="quiz-q" data-correct="c">
+<div class="quiz-q-text"><span class="quiz-q-num">3</span>¿Qué hace el nodo JSON de Node-RED al recibir el mensaje del ESP8266?</div>
+<div class="quiz-options"><label class="quiz-opt-label"><input type="radio" name="q3" value="a" /> Publica el mensaje en el broker MQTT</label> <label class="quiz-opt-label"><input type="radio" name="q3" value="b" /> Lee directamente el sensor BMP280</label> <label class="quiz-opt-label"><input type="radio" name="q3" value="c" /> Convierte el string recibido en un objeto JavaScript accesible</label> <label class="quiz-opt-label"><input type="radio" name="q3" value="d" /> Envía los datos al dashboard sin transformación</label></div>
+<div class="quiz-feedback" id="fb-q3"></div>
+</div>
+<div class="quiz-q" data-correct="d">
+<div class="quiz-q-text"><span class="quiz-q-num">4</span>¿En qué puerto corre por defecto la interfaz de Node-RED?</div>
+<div class="quiz-options"><label class="quiz-opt-label"><input type="radio" name="q4" value="a" /> 8080</label> <label class="quiz-opt-label"><input type="radio" name="q4" value="b" /> 443</label> <label class="quiz-opt-label"><input type="radio" name="q4" value="c" /> 3000</label> <label class="quiz-opt-label"><input type="radio" name="q4" value="d" /> 1880</label></div>
+<div class="quiz-feedback" id="fb-q4"></div>
+</div>
+</div>
+<button type="button" class="quiz-btn" onclick="checkQuiz()">✅ Comprobar respuestas</button>
+<div class="quiz-score" id="quiz-score"></div>
+</div>
+<!-- ══════════════════════════════════ --> <!-- ACTIVIDAD 2: RELLENAR HUECOS      --> <!-- ══════════════════════════════════ -->
+<div class="act-block">
+<div class="act-block-header">
+<div class="act-num act-num-2">2</div>
+<div>
+<div class="act-block-title">Completa el flujo de datos</div>
+<div class="act-block-sub">Rellena los huecos con el término correcto</div>
+<span class="act-tipo act-tipo-2">Rellenar huecos</span></div>
+</div>
+<div class="act-instruccion"><strong>Instrucciones:</strong> haz clic en una palabra del banco y luego en el hueco donde encaja, o escribe directamente en cada campo. Pulsa <em>Comprobar</em> al terminar.</div>
+<div class="gaps-hint"><strong>Banco de palabras:</strong> (haz clic en una palabra para seleccionarla y luego en el hueco donde colocarla)</div>
+<div class="gaps-word-bank" id="wordBank"><span class="gap-word" onclick="selectWord(this)" data-word="estacion/datos">estacion/datos</span> <span class="gap-word" onclick="selectWord(this)" data-word="JSON">JSON</span> <span class="gap-word" onclick="selectWord(this)" data-word="mqtt in">mqtt in</span> <span class="gap-word" onclick="selectWord(this)" data-word="JSON parser">JSON parser</span> <span class="gap-word" onclick="selectWord(this)" data-word="gauge">gauge</span> <span class="gap-word" onclick="selectWord(this)" data-word="WiFi">WiFi</span> <span class="gap-word" onclick="selectWord(this)" data-word="broker">broker</span></div>
+<div class="gaps-text">El ESP8266 se conecta a la red mediante <input class="gap-input" id="gap1" data-answer="WiFi" onclick="placeWord(this)" placeholder="···" type="text" /> y publica en el tópico <input class="gap-input" id="gap2" data-answer="estacion/datos" onclick="placeWord(this)" placeholder="···" style="min-width: 130px;" type="text" /> los datos del sensor en formato <input class="gap-input" id="gap3" data-answer="JSON" onclick="placeWord(this)" placeholder="···" type="text" />. El mensaje llega al <input class="gap-input" id="gap4" data-answer="broker" onclick="placeWord(this)" placeholder="···" type="text" /> MQTT, que lo distribuye a los suscriptores. Node-RED recibe el mensaje con el nodo <input class="gap-input" id="gap5" data-answer="mqtt in" onclick="placeWord(this)" placeholder="···" style="min-width: 90px;" type="text" />, lo convierte con el nodo <input class="gap-input" id="gap6" data-answer="JSON parser" onclick="placeWord(this)" placeholder="···" style="min-width: 110px;" type="text" /> y muestra los valores en el dashboard con un nodo de tipo <input class="gap-input" id="gap7" data-answer="gauge" onclick="placeWord(this)" placeholder="···" type="text" />.</div>
+<div class="gaps-btn-row"><button type="button" class="gaps-btn gaps-btn-check" onclick="checkGaps()">✅ Comprobar</button> <button type="button" class="gaps-btn gaps-btn-reset" onclick="resetGaps()">🔄 Reiniciar</button></div>
+<div class="gaps-result" id="gaps-result"></div>
+</div>
+<!-- ══════════════════════════════════ --> <!-- ACTIVIDAD 3: LISTA DESORDENADA    --> <!-- ══════════════════════════════════ -->
+<div class="act-block">
+<div class="act-block-header">
+<div class="act-num act-num-3">3</div>
+<div>
+<div class="act-block-title">Ordena el sistema IoT completo</div>
+<div class="act-block-sub">Arrastra los pasos en el orden correcto</div>
+<span class="act-tipo act-tipo-3">Lista desordenada</span></div>
+</div>
+<div class="act-instruccion"><strong>Instrucciones:</strong> arrastra cada paso a su posición correcta en el flujo completo del sistema IoT, desde la lectura del sensor hasta la visualización en el dashboard.</div>
+<div class="order-list" id="orderList"></div>
+<div class="order-btn-row"><button type="button" class="order-btn order-btn-check" onclick="checkOrder()">✅ Comprobar orden</button> <button type="button" class="order-btn order-btn-shuffle" onclick="shuffleOrder()">🔀 Mezclar de nuevo</button></div>
+<div class="order-result" id="order-result"></div>
+</div>
+</div>
+</div>
+<p>
+<script>
+// ══════════════════════════════════
+// ACTIVIDAD 1: QUIZ
+// ══════════════════════════════════
+function checkQuiz() {
+  const questions = document.querySelectorAll('#quiz1 .quiz-q');
+  let correct = 0;
+  questions.forEach((q, i) => {
+    const name = 'q' + (i + 1);
+    const selected = document.querySelector('input[name="' + name + '"]:checked');
+    const fb = document.getElementById('fb-' + name);
+    const labels = q.querySelectorAll('.quiz-opt-label');
+    labels.forEach(l => { l.classList.remove('correct', 'incorrect'); });
+    if (!selected) {
+      fb.className = 'quiz-feedback ko';
+      fb.textContent = '⚠️ Selecciona una opción';
+      return;
+    }
+    const correctVal = q.dataset.correct;
+    labels.forEach(l => {
+      const inp = l.querySelector('input');
+      if (inp.value === correctVal) l.classList.add('correct');
+      else if (inp.checked) l.classList.add('incorrect');
+    });
+    if (selected.value === correctVal) {
+      correct++;
+      fb.className = 'quiz-feedback ok';
+      fb.textContent = '✓ ¡Correcto!';
+    } else {
+      fb.className = 'quiz-feedback ko';
+      const answers = { a:'CSV', b:'JSON', c:'XML', d:'Texto plano' };
+      const correctLabels = {
+        q1: { b: 'JSON (JavaScript Object Notation)' },
+        q2: { a: 'mqtt in' },
+        q3: { c: 'Convierte el string en un objeto JavaScript accesible' },
+        q4: { d: '1880' }
+      };
+      const cl = correctLabels[name] ? (correctLabels[name][correctVal] || '') : '';
+      fb.textContent = '✗ Incorrecto. La respuesta correcta es: ' + cl;
+    }
+  });
+  const scoreEl = document.getElementById('quiz-score');
+  scoreEl.classList.add('show');
+  if (correct === 4) {
+    scoreEl.className = 'quiz-score show perfect';
+    scoreEl.textContent = '🎉 ¡Perfecto! ' + correct + '/4 respuestas correctas.';
+  } else if (correct >= 2) {
+    scoreEl.className = 'quiz-score show good';
+    scoreEl.textContent = '👍 Bien: ' + correct + '/4 correctas. Repasa las respuestas marcadas en rojo.';
+  } else {
+    scoreEl.className = 'quiz-score show low';
+    scoreEl.textContent = '📖 ' + correct + '/4 correctas. Revisa las fases 4 y 5 e inténtalo de nuevo.';
+  }
+}
+
+// ══════════════════════════════════
+// ACTIVIDAD 2: HUECOS
+// ══════════════════════════════════
+let selectedWord = null;
+
+function selectWord(el) {
+  if (el.classList.contains('used')) return;
+  document.querySelectorAll('.gap-word').forEach(w => w.style.outline = 'none');
+  if (selectedWord === el) { selectedWord = null; return; }
+  selectedWord = el;
+  el.style.outline = '2px solid var(--ci)';
+}
+
+function placeWord(inputEl) {
+  if (selectedWord) {
+    inputEl.value = selectedWord.dataset.word;
+    inputEl.classList.remove('gap-ok','gap-ko');
+    selectedWord.style.outline = 'none';
+    selectedWord.classList.add('used');
+    selectedWord = null;
+  }
+}
+
+function checkGaps() {
+  const gaps = document.querySelectorAll('.gap-input');
+  let correct = 0;
+  gaps.forEach(g => {
+    g.classList.remove('gap-ok','gap-ko');
+    if (g.value.trim().toLowerCase() === g.dataset.answer.toLowerCase()) {
+      g.classList.add('gap-ok'); correct++;
+    } else {
+      g.classList.add('gap-ko');
+    }
+  });
+  const res = document.getElementById('gaps-result');
+  res.classList.add('show');
+  if (correct === gaps.length) {
+    res.className = 'gaps-result show ok';
+    res.textContent = '🎉 ¡Perfecto! Todos los huecos son correctos.';
+  } else {
+    res.className = 'gaps-result show ko';
+    res.textContent = '✗ ' + correct + '/' + gaps.length + ' correctos. Los huecos en rojo necesitan revisión.';
+  }
+}
+
+function resetGaps() {
+  document.querySelectorAll('.gap-input').forEach(g => {
+    g.value = ''; g.classList.remove('gap-ok','gap-ko');
+  });
+  document.querySelectorAll('.gap-word').forEach(w => {
+    w.classList.remove('used'); w.style.outline = 'none';
+  });
+  const res = document.getElementById('gaps-result');
+  res.className = 'gaps-result';
+  selectedWord = null;
+}
+
+// ══════════════════════════════════
+// ACTIVIDAD 3: ORDEN
+// ══════════════════════════════════
+const correctOrder = [
+  { text: 'El sensor BMP280 mide temperatura y presión atmosférica', phase: 4 },
+  { text: 'El ESP8266 lee los valores del sensor por I2C', phase: 4 },
+  { text: 'El ESP8266 construye el mensaje en formato JSON', phase: 4 },
+  { text: 'El ESP8266 se conecta al broker MQTT por WiFi', phase: 4 },
+  { text: 'El ESP8266 publica el mensaje en el tópico <code>estacion/datos</code>', phase: 4 },
+  { text: 'Node-RED recibe el mensaje con el nodo <strong>mqtt in</strong>', phase: 5 },
+  { text: 'El nodo JSON convierte el string en un objeto accesible', phase: 5 },
+  { text: 'Los nodos <strong>change</strong> o <strong>function</strong> extraen temperatura y presión', phase: 5 },
+  { text: 'El dashboard muestra los datos en tiempo real con nodos <strong>gauge</strong> y <strong>text</strong>', phase: 5 }
+];
+
+let currentOrder = [];
+
+function buildOrderList() {
+  const list = document.getElementById('orderList');
+  list.innerHTML = '';
+  currentOrder.forEach((item, idx) => {
+    const div = document.createElement('div');
+    div.className = 'order-item';
+    div.draggable = true;
+    div.dataset.idx = idx;
+    div.innerHTML =
+      '<span class="order-drag-icon">⠿</span>' +
+      '<span class="order-pos">' + (idx + 1) + '</span>' +
+      '<span class="order-item-text">' + item.text +
+      '<span class="order-item-phase ' + (item.phase === 4 ? 'order-phase4' : 'order-phase5') + '">Fase ' + item.phase + '</span>' +
+      '</span>';
+    div.addEventListener('dragstart', onDragStart);
+    div.addEventListener('dragover', onDragOver);
+    div.addEventListener('drop', onDrop);
+    div.addEventListener('dragend', onDragEnd);
+    list.appendChild(div);
+  });
+}
+
+function shuffleOrder() {
+  currentOrder = [...correctOrder].sort(() => Math.random() - 0.5);
+  buildOrderList();
+  const res = document.getElementById('order-result');
+  res.className = 'order-result';
+}
+
+let dragSrc = null;
+function onDragStart(e) { dragSrc = this; this.classList.add('dragging'); }
+function onDragOver(e) { e.preventDefault(); this.classList.add('over'); }
+function onDrop(e) {
+  e.preventDefault();
+  if (dragSrc === this) return;
+  const srcIdx = parseInt(dragSrc.dataset.idx);
+  const tgtIdx = parseInt(this.dataset.idx);
+  const tmp = currentOrder[srcIdx];
+  currentOrder[srcIdx] = currentOrder[tgtIdx];
+  currentOrder[tgtIdx] = tmp;
+  buildOrderList();
+}
+function onDragEnd() {
+  document.querySelectorAll('.order-item').forEach(i => i.classList.remove('dragging','over'));
+}
+
+function checkOrder() {
+  const items = document.querySelectorAll('.order-item');
+  let correct = 0;
+  items.forEach((item, idx) => {
+    item.classList.remove('order-ok','order-ko');
+    const posEl = item.querySelector('.order-pos');
+    if (currentOrder[idx].text === correctOrder[idx].text) {
+      item.classList.add('order-ok'); correct++;
+    } else {
+      item.classList.add('order-ko');
+    }
+  });
+  const res = document.getElementById('order-result');
+  res.classList.add('show');
+  if (correct === correctOrder.length) {
+    res.className = 'order-result show ok';
+    res.textContent = '🎉 ¡Perfecto! El orden del flujo IoT es completamente correcto.';
+  } else if (correct >= 5) {
+    res.className = 'order-result show partial';
+    res.textContent = '👍 ' + correct + '/' + correctOrder.length + ' pasos en su lugar. Casi perfecto, revisa los marcados en rojo.';
+  } else {
+    res.className = 'order-result show ko';
+    res.textContent = '📖 ' + correct + '/' + correctOrder.length + ' correctos. Recuerda la cadena: sensor → ESP8266 → MQTT → Node-RED → dashboard.';
+  }
+}
+
+// Inicializar lista desordenada
+shuffleOrder();
+</script>
+</p></div>
+</div>
+</div>
+</article>
+<div id="packageLicense" class="cc cc-by-sa">
+<p><span>Obra publicada con</span> <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Licencia Creative Commons Reconocimiento Compartir igual 4.0</a></p>
+</div>
+</section>
+</div>
+<div id='bottomPagination'>
+<nav class="pagination noprt">
+<a href="fase_6_anlisis_reflexin_y_entrega.html" class="prev"><span><span>&laquo; </span>Anterior</span></a> <span class="sep">| </span><a href="licencia_autora_y_recursos.html" class="next"><span>Siguiente<span> &raquo;</span></span></a>
+</nav>
+</div>
+<footer id="siteFooter">Daniel Rodríguez Carrión | REA para Tecnología e Ingeniería | Curso 2025-2026 | Licencia CC </footer></div>
+<p id="made-with-eXe"><a href="https://exelearning.net/" target="_blank" rel="noopener"><span>Creado con eXeLearning<span> (Ventana nueva)</span></span></a></p><script type="text/javascript" src="_intef_js.js"></script></body></html>

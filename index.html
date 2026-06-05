@@ -1,0 +1,1000 @@
+<!doctype html>
+<html lang="es">
+<head>
+<link rel="stylesheet" type="text/css" href="base.css" />
+<link rel="stylesheet" type="text/css" href="content.css" />
+<link rel="stylesheet" type="text/css" href="nav.css" />
+<meta http-equiv="content-type" content="text/html;  charset=utf-8" />
+<title>Estación meteorológica IoT con ESP8266, BMP280 y MQTT </title>
+<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+<meta name="author" content="Daniel Rodríguez Carrión" />
+<link rel="license" type="text/html" href="http://creativecommons.org/licenses/by-sa/4.0/" />
+<meta name="generator" content="eXeLearning 2.9 - exelearning.net" />
+<meta name="description" content="Recurso Educativo Abierto dirigido a 1.º de Bachillerato en la materia de Tecnología e Ingeniería. El alumnado diseña, monta y programa una estación meteorológica IoT basada en ESP8266 y sensor BMP280, envía datos mediante MQTT en formato JSON y los visualiza en un dashboard de Node-RED. La propuesta combina electrónica, programación, comunicaciones y reflexión ética sobre el uso de tecnologías IoT." />
+<!--[if lt IE 9]><script type="text/javascript" src="exe_html5.js"></script><![endif]-->
+<script type="text/javascript" src="exe_jquery.js"></script>
+<script type="text/javascript" src="common_i18n.js"></script>
+<script type="text/javascript" src="common.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* ESTILOS PARA COPIAR EN EL EDITOR DE EXELEARNING */
+        .container-header-iot {
+            --color-unam-azul: #0a2558;
+            --color-unam-cian: #009ca6;
+            --bg-gradient: linear-gradient(135deg, var(--color-unam-azul) 0%, #1a3a7a 50%, var(--color-unam-cian) 100%);
+            
+            width: 100%;
+            margin: 0 auto 25px auto;
+            background: var(--bg-gradient);
+            border-radius: 15px;
+            overflow: hidden;
+            color: white;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            box-shadow: 0 10px 30px rgba(0, 156, 166, 0.25);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-top {
+            display: flex;
+            padding: 30px 40px;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-info {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .header-info .subject {
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #b3e6ec;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .header-info h1 {
+            margin: 0;
+            font-size: 2.4rem;
+            font-weight: 800;
+            line-height: 1.1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header-info p.tagline {
+            margin: 10px 0 0 0;
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 300;
+        }
+
+        .header-logo-box {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+
+        .header-logo-box:hover {
+            transform: scale(1.03);
+        }
+
+        .header-logo-box img {
+            height: 65px;
+            width: auto;
+            display: block;
+        }
+
+        .header-bottom {
+            background: rgba(0, 0, 0, 0.15);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .tech-stack {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Recuperación de los tags con efectos de hover */
+        .tech-pill {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(4px);
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .tech-pill:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
+        .project-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #e0faff;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Efecto de red de fondo decorativo */
+        .header-pattern {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .header-top { padding: 20px; }
+            .header-bottom { padding: 15px 20px; }
+            .header-info h1 { font-size: 1.8rem; }
+            .header-logo-box img { height: 50px; }
+            .project-meta { width: 100%; justify-content: space-between; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- BLOQUE HTML PARA PEGAR EN EL iDEVICE DE EXELARNING -->
+    <div class="container-header-iot" style="position: relative;">
+        <div class="header-pattern"></div>
+        
+        <div class="header-top">
+            <div class="header-info">
+                <span class="subject">Tecnología e Ingeniería I • Bachillerato</span>
+                <h1>Estación Meteorológica IoT</h1>
+                <p class="tagline">Diseño, Programación y Ética en la Cultura Maker</p>
+                
+                <div class="tech-stack" style="margin-top: 22px;">
+                    <span class="tech-pill">ESP8266</span>
+                    <span class="tech-pill">BMP280</span>
+                    <span class="tech-pill">MQTT / JSON</span>
+                    <span class="tech-pill">Node-RED</span>
+                </div>
+            </div>
+            
+            <div class="header-logo-box">
+                <!-- Enlace actualizado con el logo de la Universidad del Atlántico Medio -->
+                <img src="https://www.universidadatlanticomedio.es/img/logo/UNAM_logo.png" alt="Logotipo Universidad del Atlántico Medio">
+            </div>
+        </div>
+
+        <div class="header-bottom">
+            <div class="project-meta">
+                <div class="meta-item">
+                    <span>📡 <b>Fase:</b> Prototipado y Comunicaciones</span>
+                </div>
+                <div class="meta-item">
+                    <span>💡 <b>Metodología:</b> ABP</span>
+                </div>
+            </div>
+            <div style="font-size: 0.75rem; opacity: 0.7; letter-spacing: 0.5px;">
+                RECURSO EDUCATIVO ABIERTO (REA)
+            </div>
+        </div>
+    </div>
+    <!-- FIN DEL BLOQUE HTML -->
+
+</body>
+</html></head>
+<body class="exe-web-site" id="exe-node-0"><script type="text/javascript">document.body.className+=" js"</script>
+<div id="content">
+<p id="skipNav"><a href="#main" class="sr-av">Saltar la navegación</a></p>
+<header id="header" ><div id="headerContent">Estación meteorológica IoT con ESP8266, BMP280 y MQTT</div></header>
+<nav id="siteNav">
+<ul>
+   <li id="active"><a href="index.html" class="active daddy main-node">Inicio</a></li>
+   <li><a href="gua_didctica.html" class="no-ch">Guía didáctica</a></li>
+   <li><a href="introduccin_al_proyecto.html" class="daddy">Introducción al proyecto</a>
+   <ul class="other-section">
+      <li><a href="fase_1_electrnica_y_soldadura.html" class="no-ch">Fase 1. Electrónica y soldadura</a></li>
+      <li><a href="fase_2_lectura_local_del_sensor.html" class="no-ch">Fase 2. Lectura local del sensor</a></li>
+      <li><a href="fase_3_iot_wifi_mqtt_y_json.html" class="no-ch">Fase 3. IoT, WiFi, MQTT y JSON</a></li>
+      <li><a href="fase_4_envo_de_datos_va_mqtt.html" class="no-ch">Fase 4. Envío de datos vía MQTT</a></li>
+      <li><a href="fase_5_nodered_y_dashboard.html" class="no-ch">Fase 5. Node-RED y dashboard</a></li>
+      <li><a href="fase_6_anlisis_reflexin_y_entrega.html" class="no-ch">Fase 6. Análisis, reflexión y entrega</a></li>
+   </ul>
+   </li>
+   <li><a href="actividades_interactivas.html" class="no-ch">Actividades interactivas</a></li>
+   <li><a href="licencia_autora_y_recursos.html" class="no-ch">Licencia, autoría y recursos</a></li>
+</ul>
+</nav>
+<div id='topPagination'>
+<nav class="pagination noprt">
+<a href="gua_didctica.html" class="next"><span>Siguiente<span> &raquo;</span></span></a>
+</nav>
+</div>
+<div id="main-wrapper">
+<section id="main">
+<header id="nodeDecoration"><h1 id="nodeTitle">Inicio</h1></header>
+<article class="iDevice_wrapper textIdevice" id="id2">
+<div class="iDevice emphasis0" >
+<div id="ta2_128_2" class="block iDevice_content">
+<div class="exe-text"><style>
+  .rea-iot-v2{
+    --iot-azul:#0a2558;
+    --iot-azul-2:#143a7b;
+    --iot-cian:#009ca6;
+    --iot-cian-soft:#dff7f8;
+    --iot-bg:#f4f8fc;
+    --iot-white:#ffffff;
+    --iot-text:#18314f;
+    --iot-muted:#56708f;
+    --iot-border:rgba(10,37,88,0.10);
+    --iot-shadow:0 12px 30px rgba(10,37,88,0.10);
+    --iot-shadow-strong:0 16px 36px rgba(0,156,166,0.16);
+    font-family:'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color:var(--iot-text);
+    margin:0 0 30px 0;
+  }
+
+  .rea-iot-v2 *{
+    box-sizing:border-box;
+  }
+
+  .rea-iot-shell{
+    background:linear-gradient(180deg, #eef4fb 0%, #f8fbfe 100%);
+    border:1px solid rgba(10,37,88,0.06);
+    border-radius:22px;
+    padding:28px;
+    box-shadow:var(--iot-shadow);
+    overflow:hidden;
+    position:relative;
+  }
+
+  .rea-iot-shell:before{
+    content:"";
+    position:absolute;
+    inset:auto -120px -120px auto;
+    width:260px;
+    height:260px;
+    background:radial-gradient(circle, rgba(0,156,166,0.14) 0%, rgba(0,156,166,0.02) 55%, transparent 70%);
+    border-radius:50%;
+    pointer-events:none;
+  }
+
+  .rea-iot-main{
+    display:grid;
+    grid-template-columns: 1.15fr 0.95fr;
+    gap:24px;
+    align-items:stretch;
+  }
+
+  .rea-hero-panel{
+    background:linear-gradient(135deg, rgba(10,37,88,0.98) 0%, rgba(20,58,123,0.96) 52%, rgba(0,156,166,0.92) 100%);
+    border-radius:22px;
+    padding:30px;
+    color:#fff;
+    box-shadow:var(--iot-shadow-strong);
+    position:relative;
+    overflow:hidden;
+  }
+
+  .rea-hero-panel:before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background-image:
+      radial-gradient(rgba(255,255,255,0.12) 1px, transparent 1px),
+      linear-gradient(135deg, rgba(255,255,255,0.08), transparent 40%);
+    background-size:18px 18px, auto;
+    opacity:0.7;
+    pointer-events:none;
+  }
+
+  .rea-hero-content{
+    position:relative;
+    z-index:1;
+  }
+
+  .rea-kicker{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 14px;
+    background:rgba(255,255,255,0.12);
+    border:1px solid rgba(255,255,255,0.22);
+    border-radius:999px;
+    font-size:0.78rem;
+    font-weight:800;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    margin-bottom:18px;
+    backdrop-filter:blur(4px);
+    -webkit-backdrop-filter:blur(4px);
+  }
+
+  .rea-hero-title{
+    margin:0 0 14px 0;
+    font-size:2.35rem;
+    line-height:1.08;
+    font-weight:800;
+    letter-spacing:-0.4px;
+    max-width:11ch;
+  }
+
+  .rea-hero-lead{
+    margin:0 0 18px 0;
+    font-size:1.03rem;
+    line-height:1.7;
+    color:rgba(255,255,255,0.92);
+    max-width:62ch;
+  }
+
+  .rea-pill-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin:18px 0 22px 0;
+  }
+
+  .rea-pill{
+    position:relative;
+    overflow:hidden;
+    padding:8px 14px;
+    border-radius:999px;
+    background:rgba(255,255,255,0.16);
+    border:1px solid rgba(255,255,255,0.24);
+    font-size:0.82rem;
+    font-weight:700;
+    letter-spacing:0.3px;
+    color:#ffffff;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    cursor:default;
+    backdrop-filter:blur(4px);
+    -webkit-backdrop-filter:blur(4px);
+    transition:
+      transform 0.28s ease,
+      background-color 0.28s ease,
+      border-color 0.28s ease,
+      box-shadow 0.28s ease,
+      color 0.28s ease;
+  }
+
+  .rea-pill:before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:-120%;
+    width:80%;
+    height:100%;
+    background:linear-gradient(
+      90deg,
+      transparent,
+      rgba(255,255,255,0.28),
+      transparent
+    );
+    transform:skewX(-20deg);
+    transition:left 0.45s ease;
+    pointer-events:none;
+  }
+
+  .rea-pill:hover{
+    transform:translateY(-4px) scale(1.04);
+    background:rgba(255,255,255,0.30);
+    border-color:rgba(255,255,255,0.58);
+    box-shadow:
+      0 8px 18px rgba(0,0,0,0.18),
+      0 0 0 1px rgba(255,255,255,0.06) inset,
+      0 0 18px rgba(0,156,166,0.20);
+    color:#ffffff;
+  }
+
+  .rea-pill:hover:before{
+    left:130%;
+  }
+
+  .rea-guiding-box{
+    background:rgba(255,255,255,0.10);
+    border:1px solid rgba(255,255,255,0.18);
+    border-radius:18px;
+    padding:18px 18px 16px 18px;
+  }
+
+  .rea-guiding-box strong{
+    display:block;
+    font-size:0.92rem;
+    margin-bottom:6px;
+    color:#bff8fb;
+    text-transform:uppercase;
+    letter-spacing:0.8px;
+  }
+
+  .rea-guiding-box p{
+    margin:0;
+    font-size:0.98rem;
+    line-height:1.6;
+    color:rgba(255,255,255,0.95);
+  }
+
+  .rea-dashboard-panel{
+    display:grid;
+    grid-template-rows:auto auto 1fr;
+    gap:18px;
+  }
+
+  .rea-stat-grid{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:14px;
+  }
+
+  .rea-stat{
+    background:var(--iot-white);
+    border:1px solid var(--iot-border);
+    border-radius:18px;
+    padding:18px;
+    box-shadow:var(--iot-shadow);
+    transition:
+      transform 0.25s ease,
+      box-shadow 0.25s ease,
+      border-color 0.25s ease;
+  }
+
+  .rea-stat:hover{
+    transform:translateY(-4px);
+    box-shadow:0 14px 28px rgba(10,37,88,0.14);
+    border-color:rgba(0,156,166,0.22);
+  }
+
+  .rea-stat .label{
+    display:block;
+    margin-bottom:8px;
+    font-size:0.78rem;
+    text-transform:uppercase;
+    letter-spacing:0.9px;
+    font-weight:800;
+    color:var(--iot-muted);
+  }
+
+  .rea-stat .value{
+    display:block;
+    font-size:1.65rem;
+    line-height:1;
+    font-weight:800;
+    color:var(--iot-azul);
+    margin-bottom:6px;
+  }
+
+  .rea-stat .desc{
+    font-size:0.92rem;
+    color:var(--iot-muted);
+    line-height:1.45;
+  }
+
+  .rea-visual-card{
+    background:var(--iot-white);
+    border:1px solid var(--iot-border);
+    border-radius:22px;
+    padding:20px;
+    box-shadow:var(--iot-shadow);
+  }
+
+  .rea-card-title{
+    margin:0 0 14px 0;
+    font-size:1.08rem;
+    font-weight:800;
+    color:var(--iot-azul);
+  }
+
+  .rea-flow{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+
+  .rea-node{
+    flex:1 1 120px;
+    min-width:120px;
+    background:linear-gradient(180deg, #ffffff 0%, #f4fbfc 100%);
+    border:1px solid rgba(0,156,166,0.18);
+    border-radius:16px;
+    padding:14px 12px;
+    text-align:center;
+    position:relative;
+    transition:
+      transform 0.25s ease,
+      box-shadow 0.25s ease,
+      border-color 0.25s ease;
+  }
+
+  .rea-node:hover{
+    transform:translateY(-5px);
+    border-color:rgba(0,156,166,0.34);
+    box-shadow:0 14px 26px rgba(0,156,166,0.12);
+  }
+
+  .rea-node .icon{
+    width:42px;
+    height:42px;
+    margin:0 auto 10px auto;
+    border-radius:14px;
+    background:linear-gradient(135deg, var(--iot-azul) 0%, var(--iot-cian) 100%);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1.2rem;
+    font-weight:800;
+    box-shadow:0 8px 20px rgba(0,156,166,0.22);
+  }
+
+  .rea-node strong{
+    display:block;
+    color:var(--iot-azul);
+    font-size:0.92rem;
+    margin-bottom:4px;
+  }
+
+  .rea-node span{
+    display:block;
+    color:var(--iot-muted);
+    font-size:0.82rem;
+    line-height:1.35;
+  }
+
+  .rea-arrow{
+    flex:0 0 auto;
+    color:var(--iot-cian);
+    font-size:1.5rem;
+    font-weight:800;
+    opacity:0.9;
+  }
+
+  .rea-dashboard-mockup{
+    margin-top:18px;
+    background:linear-gradient(180deg, #0f1f43 0%, #17315f 100%);
+    border-radius:18px;
+    padding:18px;
+    color:#fff;
+    overflow:hidden;
+    position:relative;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,0.04);
+  }
+
+  .rea-dashboard-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:14px;
+  }
+
+  .rea-dots{
+    display:flex;
+    gap:6px;
+  }
+
+  .rea-dots span{
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    display:block;
+    background:rgba(255,255,255,0.35);
+  }
+
+  .rea-screen-label{
+    font-size:0.8rem;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    color:#b7f4f6;
+    font-weight:700;
+  }
+
+  .rea-gauges{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:12px;
+  }
+
+  .rea-gauge{
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:16px;
+    padding:14px;
+    text-align:center;
+    transition:
+      transform 0.25s ease,
+      background-color 0.25s ease,
+      border-color 0.25s ease;
+  }
+
+  .rea-gauge:hover{
+    transform:translateY(-4px);
+    background:rgba(255,255,255,0.09);
+    border-color:rgba(255,255,255,0.16);
+  }
+
+  .rea-gauge .g-title{
+    font-size:0.78rem;
+    text-transform:uppercase;
+    letter-spacing:0.8px;
+    color:#b7f4f6;
+    margin-bottom:8px;
+    display:block;
+  }
+
+  .rea-ring{
+    width:76px;
+    height:76px;
+    margin:0 auto 8px auto;
+    border-radius:50%;
+    background:
+      radial-gradient(circle at center, #17315f 42%, transparent 44%),
+      conic-gradient(#27d5d7 0 72%, rgba(255,255,255,0.10) 72% 100%);
+    box-shadow: inset 0 0 0 8px rgba(255,255,255,0.05);
+  }
+
+  .rea-ring.r2{
+    background:
+      radial-gradient(circle at center, #17315f 42%, transparent 44%),
+      conic-gradient(#ffc857 0 64%, rgba(255,255,255,0.10) 64% 100%);
+  }
+
+  .rea-ring.r3{
+    background:
+      radial-gradient(circle at center, #17315f 42%, transparent 44%),
+      conic-gradient(#67e8a1 0 58%, rgba(255,255,255,0.10) 58% 100%);
+  }
+
+  .rea-gauge .g-value{
+    font-size:1.05rem;
+    font-weight:800;
+    color:#fff;
+  }
+
+  .rea-bottom-grid{
+    margin-top:22px;
+    display:grid;
+    grid-template-columns:1.1fr 0.9fr;
+    gap:22px;
+  }
+
+  .rea-panel{
+    background:var(--iot-white);
+    border:1px solid var(--iot-border);
+    border-radius:20px;
+    padding:22px;
+    box-shadow:var(--iot-shadow);
+  }
+
+  .rea-panel h3{
+    margin:0 0 14px 0;
+    color:var(--iot-azul);
+    font-size:1.12rem;
+    font-weight:800;
+  }
+
+  .rea-list{
+    display:grid;
+    gap:12px;
+  }
+
+  .rea-list-item{
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+    background:linear-gradient(180deg, #fbfdff 0%, #f5fbfd 100%);
+    border:1px solid rgba(0,156,166,0.14);
+    border-radius:16px;
+    padding:14px;
+    transition:
+      transform 0.25s ease,
+      box-shadow 0.25s ease,
+      border-color 0.25s ease;
+  }
+
+  .rea-list-item:hover{
+    transform:translateX(4px);
+    border-color:rgba(0,156,166,0.26);
+    box-shadow:0 10px 22px rgba(10,37,88,0.08);
+  }
+
+  .rea-list-num{
+    width:30px;
+    height:30px;
+    border-radius:50%;
+    background:var(--iot-azul);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:0.9rem;
+    font-weight:800;
+    flex:0 0 30px;
+  }
+
+  .rea-list-item strong{
+    color:var(--iot-azul);
+    display:block;
+    margin-bottom:4px;
+    font-size:0.95rem;
+  }
+
+  .rea-list-item span{
+    color:var(--iot-muted);
+    font-size:0.92rem;
+    line-height:1.45;
+  }
+
+  .rea-product{
+    background:linear-gradient(135deg, #effbfc 0%, #ffffff 100%);
+    border:1px solid rgba(0,156,166,0.16);
+    border-radius:18px;
+    padding:18px;
+    margin-bottom:14px;
+    transition:
+      transform 0.25s ease,
+      box-shadow 0.25s ease,
+      border-color 0.25s ease;
+  }
+
+  .rea-product:hover{
+    transform:translateY(-4px);
+    border-color:rgba(0,156,166,0.28);
+    box-shadow:0 14px 26px rgba(0,156,166,0.10);
+  }
+
+  .rea-product strong{
+    display:block;
+    color:var(--iot-azul);
+    margin-bottom:8px;
+    font-size:0.98rem;
+  }
+
+  .rea-product p{
+    margin:0;
+    color:var(--iot-text);
+    line-height:1.6;
+    font-size:0.95rem;
+  }
+
+  .rea-microtags{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:12px;
+  }
+
+  .rea-microtags span{
+    background:var(--iot-cian-soft);
+    color:var(--iot-azul);
+    border-radius:999px;
+    padding:7px 12px;
+    font-size:0.78rem;
+    font-weight:700;
+    transition:
+      transform 0.24s ease,
+      background-color 0.24s ease,
+      box-shadow 0.24s ease;
+  }
+
+  .rea-microtags span:hover{
+    transform:translateY(-3px);
+    background:#c8f2f4;
+    box-shadow:0 8px 18px rgba(0,156,166,0.12);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .rea-pill,
+    .rea-pill:before,
+    .rea-stat,
+    .rea-node,
+    .rea-gauge,
+    .rea-list-item,
+    .rea-product,
+    .rea-microtags span{
+      transition:none !important;
+    }
+
+    .rea-pill:hover,
+    .rea-stat:hover,
+    .rea-node:hover,
+    .rea-gauge:hover,
+    .rea-list-item:hover,
+    .rea-product:hover,
+    .rea-microtags span:hover{
+      transform:none !important;
+    }
+  }
+
+  @media (max-width: 980px){
+    .rea-iot-main,
+    .rea-bottom-grid{
+      grid-template-columns:1fr;
+    }
+  }
+
+  @media (max-width: 640px){
+    .rea-iot-shell{
+      padding:18px;
+      border-radius:18px;
+    }
+
+    .rea-hero-panel,
+    .rea-panel,
+    .rea-visual-card,
+    .rea-stat{
+      border-radius:16px;
+      padding:18px;
+    }
+
+    .rea-hero-title{
+      font-size:1.82rem;
+      max-width:none;
+    }
+
+    .rea-stat-grid,
+    .rea-gauges{
+      grid-template-columns:1fr;
+    }
+
+    .rea-flow{
+      flex-direction:column;
+      align-items:stretch;
+    }
+
+    .rea-arrow{
+      align-self:center;
+      transform:rotate(90deg);
+    }
+  }
+</style>
+<div class="rea-iot-v2">
+<div class="rea-iot-shell">
+<div class="rea-iot-main">
+<div class="rea-hero-panel">
+<div class="rea-hero-content">
+<div class="rea-kicker">Proyecto ABP · REA · 1.º de Bachillerato</div>
+<h2 class="rea-hero-title">Diseña, programa y visualiza una estación meteorológica IoT.</h2>
+<p class="rea-hero-lead">Este recurso propone un proyecto tecnológico completo en el que el alumnado monta un sistema con ESP8266 y BMP280, obtiene datos del entorno, los transmite mediante MQTT en formato JSON y los representa en un dashboard funcional con Node-RED.</p>
+<div class="rea-pill-row"><span class="rea-pill">ESP8266</span> <span class="rea-pill">BMP280</span> <span class="rea-pill">MQTT</span> <span class="rea-pill">JSON</span> <span class="rea-pill">Node-RED</span> <span class="rea-pill">12–14 sesiones</span></div>
+<div class="rea-guiding-box"><strong>Pregunta guía</strong>
+<p>¿Cómo podemos captar datos del entorno, enviarlos a través de la red y convertirlos en información útil mediante una interfaz visual en tiempo real?</p>
+</div>
+</div>
+</div>
+<div class="rea-dashboard-panel">
+<div class="rea-stat-grid">
+<div class="rea-stat"><span class="label">Nivel</span> <span class="value">1.º Bach.</span> <span class="desc">Tecnología e Ingeniería con enfoque práctico y competencial.</span></div>
+<div class="rea-stat"><span class="label">Metodología</span> <span class="value">ABP</span> <span class="desc">Aprendizaje basado en proyectos con producto funcional final.</span></div>
+<div class="rea-stat"><span class="label">Duración</span> <span class="value">12–14</span> <span class="desc">Sesiones distribuidas entre práctica, teoría y evaluación.</span></div>
+<div class="rea-stat"><span class="label">Producto</span> <span class="value">Dashboard</span> <span class="desc">Visualización de datos reales en Node-RED.</span></div>
+</div>
+<div class="rea-visual-card">
+<h3 class="rea-card-title">Flujo del sistema</h3>
+<div class="rea-flow">
+<div class="rea-node">
+<div class="icon">①</div>
+<strong>Sensor</strong> <span>BMP280 mide temperatura y presión.</span></div>
+<div class="rea-arrow">→</div>
+<div class="rea-node">
+<div class="icon">②</div>
+<strong>ESP8266</strong> <span>Procesa datos y gestiona la conectividad WiFi.</span></div>
+<div class="rea-arrow">→</div>
+<div class="rea-node">
+<div class="icon">③</div>
+<strong>MQTT / JSON</strong> <span>Publica la información en red de forma estructurada.</span></div>
+<div class="rea-arrow">→</div>
+<div class="rea-node">
+<div class="icon">④</div>
+<strong>Node-RED</strong> <span>Recibe, interpreta y muestra datos en tiempo real.</span></div>
+</div>
+<div class="rea-dashboard-mockup">
+<div class="rea-dashboard-top">
+<div class="rea-dots"><span></span><span></span><span></span></div>
+<div class="rea-screen-label">Vista del dashboard</div>
+</div>
+<div class="rea-gauges">
+<div class="rea-gauge"><span class="g-title">Temperatura</span>
+<div class="rea-ring"></div>
+<div class="g-value">24.6 °C</div>
+</div>
+<div class="rea-gauge"><span class="g-title">Presión</span>
+<div class="rea-ring r2"></div>
+<div class="g-value">1008 hPa</div>
+</div>
+<div class="rea-gauge"><span class="g-title">Humedad</span>
+<div class="rea-ring r3"></div>
+<div class="g-value">60 %</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="rea-bottom-grid">
+<div class="rea-panel">
+<h3>Ruta de aprendizaje</h3>
+<div class="rea-list">
+<div class="rea-list-item">
+<div class="rea-list-num">1</div>
+<div><strong>Electrónica y montaje</strong> <span>Identificación de componentes, conexiones y comprobación del circuito con seguridad.</span></div>
+</div>
+<div class="rea-list-item">
+<div class="rea-list-num">2</div>
+<div><strong>Lectura local del sensor</strong> <span>Uso de Arduino IDE, monitor serie e introducción al protocolo I2C.</span></div>
+</div>
+<div class="rea-list-item">
+<div class="rea-list-num">3</div>
+<div><strong>IoT y comunicaciones</strong> <span>Comprensión de la arquitectura IoT, la red WiFi, MQTT y el formato JSON.</span></div>
+</div>
+<div class="rea-list-item">
+<div class="rea-list-num">4</div>
+<div><strong>Visualización de datos</strong> <span>Construcción de flujos y paneles en Node-RED para interpretar datos empíricos.</span></div>
+</div>
+<div class="rea-list-item">
+<div class="rea-list-num">5</div>
+<div><strong>Reflexión y mejora</strong> <span>Análisis crítico sobre aplicaciones, privacidad, sostenibilidad y posibles mejoras del sistema.</span></div>
+</div>
+</div>
+</div>
+<div class="rea-panel">
+<h3>Producto final esperado</h3>
+<div class="rea-product"><strong>Prototipo funcional</strong>
+<p>Una estación meteorológica IoT capaz de captar datos físicos del entorno, enviarlos por MQTT y representarlos en un dashboard visual para su análisis e interpretación.</p>
+</div>
+<div class="rea-product"><strong>Competencias que se activan</strong>
+<p>Pensamiento computacional, competencia digital, resolución de problemas tecnológicos y análisis de datos en contextos reales.</p>
+<div class="rea-microtags"><span>Electrónica</span> <span>Programación</span> <span>Redes</span> <span>IoT</span> <span>Visualización</span></div>
+</div>
+</div>
+</div>
+</div>
+</div></div>
+</div>
+</div>
+</article>
+<div id="packageLicense" class="cc cc-by-sa">
+<p><span>Obra publicada con</span> <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Licencia Creative Commons Reconocimiento Compartir igual 4.0</a></p>
+</div>
+</section>
+</div>
+<div id='bottomPagination'>
+<nav class="pagination noprt">
+<a href="gua_didctica.html" class="next"><span>Siguiente<span> &raquo;</span></span></a>
+</nav>
+</div>
+<footer id="siteFooter">Daniel Rodríguez Carrión | REA para Tecnología e Ingeniería | Curso 2025-2026 | Licencia CC </footer></div>
+<p id="made-with-eXe"><a href="https://exelearning.net/" target="_blank" rel="noopener"><span>Creado con eXeLearning<span> (Ventana nueva)</span></span></a></p><script type="text/javascript" src="_intef_js.js"></script></body></html>

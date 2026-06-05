@@ -1,0 +1,885 @@
+<!doctype html>
+<html lang="es">
+<head>
+<link rel="stylesheet" type="text/css" href="base.css" />
+<link rel="stylesheet" type="text/css" href="exe_lightbox.css" />
+<link rel="stylesheet" type="text/css" href="content.css" />
+<link rel="stylesheet" type="text/css" href="nav.css" />
+<meta http-equiv="content-type" content="text/html;  charset=utf-8" />
+<title>Fase 4. Envío de datos vía MQTT | Estación meteorológica IoT con ESP8266, BMP280 y MQTT </title>
+<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+<meta name="author" content="Daniel Rodríguez Carrión" />
+<link rel="license" type="text/html" href="http://creativecommons.org/licenses/by-sa/4.0/" />
+<meta name="generator" content="eXeLearning 2.9 - exelearning.net" />
+<!--[if lt IE 9]><script type="text/javascript" src="exe_html5.js"></script><![endif]-->
+<script type="text/javascript" src="exe_jquery.js"></script>
+<script type="text/javascript" src="exe_lightbox.js"></script>
+<script type="text/javascript" src="common_i18n.js"></script>
+<script type="text/javascript" src="common.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* ESTILOS PARA COPIAR EN EL EDITOR DE EXELEARNING */
+        .container-header-iot {
+            --color-unam-azul: #0a2558;
+            --color-unam-cian: #009ca6;
+            --bg-gradient: linear-gradient(135deg, var(--color-unam-azul) 0%, #1a3a7a 50%, var(--color-unam-cian) 100%);
+            
+            width: 100%;
+            margin: 0 auto 25px auto;
+            background: var(--bg-gradient);
+            border-radius: 15px;
+            overflow: hidden;
+            color: white;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            box-shadow: 0 10px 30px rgba(0, 156, 166, 0.25);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-top {
+            display: flex;
+            padding: 30px 40px;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-info {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .header-info .subject {
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #b3e6ec;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .header-info h1 {
+            margin: 0;
+            font-size: 2.4rem;
+            font-weight: 800;
+            line-height: 1.1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header-info p.tagline {
+            margin: 10px 0 0 0;
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 300;
+        }
+
+        .header-logo-box {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+
+        .header-logo-box:hover {
+            transform: scale(1.03);
+        }
+
+        .header-logo-box img {
+            height: 65px;
+            width: auto;
+            display: block;
+        }
+
+        .header-bottom {
+            background: rgba(0, 0, 0, 0.15);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .tech-stack {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Recuperación de los tags con efectos de hover */
+        .tech-pill {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(4px);
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .tech-pill:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
+        .project-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #e0faff;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Efecto de red de fondo decorativo */
+        .header-pattern {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .header-top { padding: 20px; }
+            .header-bottom { padding: 15px 20px; }
+            .header-info h1 { font-size: 1.8rem; }
+            .header-logo-box img { height: 50px; }
+            .project-meta { width: 100%; justify-content: space-between; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- BLOQUE HTML PARA PEGAR EN EL iDEVICE DE EXELARNING -->
+    <div class="container-header-iot" style="position: relative;">
+        <div class="header-pattern"></div>
+        
+        <div class="header-top">
+            <div class="header-info">
+                <span class="subject">Tecnología e Ingeniería I • Bachillerato</span>
+                <h1>Estación Meteorológica IoT</h1>
+                <p class="tagline">Diseño, Programación y Ética en la Cultura Maker</p>
+                
+                <div class="tech-stack" style="margin-top: 22px;">
+                    <span class="tech-pill">ESP8266</span>
+                    <span class="tech-pill">BMP280</span>
+                    <span class="tech-pill">MQTT / JSON</span>
+                    <span class="tech-pill">Node-RED</span>
+                </div>
+            </div>
+            
+            <div class="header-logo-box">
+                <!-- Enlace actualizado con el logo de la Universidad del Atlántico Medio -->
+                <img src="https://www.universidadatlanticomedio.es/img/logo/UNAM_logo.png" alt="Logotipo Universidad del Atlántico Medio">
+            </div>
+        </div>
+
+        <div class="header-bottom">
+            <div class="project-meta">
+                <div class="meta-item">
+                    <span>📡 <b>Fase:</b> Prototipado y Comunicaciones</span>
+                </div>
+                <div class="meta-item">
+                    <span>💡 <b>Metodología:</b> ABP</span>
+                </div>
+            </div>
+            <div style="font-size: 0.75rem; opacity: 0.7; letter-spacing: 0.5px;">
+                RECURSO EDUCATIVO ABIERTO (REA)
+            </div>
+        </div>
+    </div>
+    <!-- FIN DEL BLOQUE HTML -->
+
+</body>
+</html></head>
+<body class="exe-web-site" id="exe-node-12"><script type="text/javascript">document.body.className+=" js"</script>
+<div id="content">
+<p id="skipNav"><a href="#main" class="sr-av">Saltar la navegación</a></p>
+<header id="header" ><div id="headerContent">Estación meteorológica IoT con ESP8266, BMP280 y MQTT</div></header>
+<nav id="siteNav">
+<ul>
+   <li><a href="index.html" class="daddy main-node">Inicio</a></li>
+   <li><a href="gua_didctica.html" class="no-ch">Guía didáctica</a></li>
+   <li class="current-page-parent"><a href="introduccin_al_proyecto.html" class="current-page-parent daddy">Introducción al proyecto</a>
+   <ul>
+      <li><a href="fase_1_electrnica_y_soldadura.html" class="no-ch">Fase 1. Electrónica y soldadura</a></li>
+      <li><a href="fase_2_lectura_local_del_sensor.html" class="no-ch">Fase 2. Lectura local del sensor</a></li>
+      <li><a href="fase_3_iot_wifi_mqtt_y_json.html" class="no-ch">Fase 3. IoT, WiFi, MQTT y JSON</a></li>
+      <li id="active"><a href="fase_4_envo_de_datos_va_mqtt.html" class="active no-ch">Fase 4. Envío de datos vía MQTT</a></li>
+      <li><a href="fase_5_nodered_y_dashboard.html" class="no-ch">Fase 5. Node-RED y dashboard</a></li>
+      <li><a href="fase_6_anlisis_reflexin_y_entrega.html" class="no-ch">Fase 6. Análisis, reflexión y entrega</a></li>
+   </ul>
+   </li>
+   <li><a href="actividades_interactivas.html" class="no-ch">Actividades interactivas</a></li>
+   <li><a href="licencia_autora_y_recursos.html" class="no-ch">Licencia, autoría y recursos</a></li>
+</ul>
+</nav>
+<div id='topPagination'>
+<nav class="pagination noprt">
+<a href="fase_3_iot_wifi_mqtt_y_json.html" class="prev"><span><span>&laquo; </span>Anterior</span></a> <span class="sep">| </span><a href="fase_5_nodered_y_dashboard.html" class="next"><span>Siguiente<span> &raquo;</span></span></a>
+</nav>
+</div>
+<div id="main-wrapper">
+<section id="main">
+<header id="nodeDecoration"><h1 id="nodeTitle">Fase 4. Envío de datos vía MQTT</h1></header>
+<article class="iDevice_wrapper textIdevice" id="id13">
+<div class="iDevice emphasis0" >
+<div id="ta13_139_2" class="block iDevice_content">
+<div class="exe-text"><style>
+  .fase4-iot{
+    --f4-azul:#0a2558;
+    --f4-azul-2:#143a7b;
+    --f4-cian:#009ca6;
+    --f4-cian-soft:#e6f8f9;
+    --f4-naranja:#d97a00;
+    --f4-naranja-soft:#fff3e4;
+    --f4-bg:#f4f8fc;
+    --f4-white:#ffffff;
+    --f4-text:#18314f;
+    --f4-muted:#5d7690;
+    --f4-border:rgba(10,37,88,0.10);
+    --f4-shadow:0 12px 28px rgba(10,37,88,0.08);
+    --f4-code-bg:#0d1b2e;
+    --f4-code-text:#e2f0ff;
+    font-family:'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color:var(--f4-text);
+    margin:0 0 30px 0;
+  }
+
+  .fase4-iot *{ box-sizing:border-box; }
+
+  .fase4-shell{
+    background:linear-gradient(180deg,#f8fbfe 0%, #eef5fb 100%);
+    border:1px solid rgba(10,37,88,0.06);
+    border-radius:22px;
+    padding:26px;
+    box-shadow:var(--f4-shadow);
+  }
+
+  .fase4-hero{
+    background:linear-gradient(135deg,#0a2558 0%, #143a7b 55%, #009ca6 100%);
+    color:#fff;
+    border-radius:22px;
+    padding:28px;
+    margin-bottom:22px;
+    position:relative;
+    overflow:hidden;
+    box-shadow:0 16px 34px rgba(0,156,166,0.16);
+  }
+
+  .fase4-hero:before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background-image:
+      radial-gradient(rgba(255,255,255,0.12) 1px, transparent 1px),
+      linear-gradient(135deg, rgba(255,255,255,0.08), transparent 40%);
+    background-size:18px 18px, auto;
+    opacity:0.6;
+    pointer-events:none;
+  }
+
+  .fase4-hero > *{
+    position:relative;
+    z-index:1;
+  }
+
+  .fase4-kicker{
+    display:inline-block;
+    padding:8px 14px;
+    background:rgba(255,255,255,0.12);
+    border:1px solid rgba(255,255,255,0.22);
+    border-radius:999px;
+    font-size:0.78rem;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    margin-bottom:16px;
+  }
+
+  .fase4-hero h2{
+    margin:0 0 12px 0;
+    font-size:1.95rem;
+    line-height:1.08;
+    font-weight:800;
+  }
+
+  .fase4-hero p{
+    margin:0 0 14px 0;
+    font-size:1rem;
+    line-height:1.7;
+    color:rgba(255,255,255,0.93);
+  }
+
+  .fase4-pill-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:16px;
+  }
+
+  .fase4-pill{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:8px 14px;
+    border-radius:999px;
+    background:rgba(255,255,255,0.16);
+    border:1px solid rgba(255,255,255,0.24);
+    color:#ffffff;
+    font-size:0.82rem;
+    font-weight:700;
+    letter-spacing:0.3px;
+    cursor:help;
+    transition:transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+  }
+
+  .fase4-pill:hover{
+    transform:translateY(-3px);
+    background:rgba(255,255,255,0.28);
+    box-shadow:0 8px 18px rgba(0,0,0,0.14);
+  }
+
+  .fase4-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:22px;
+    margin-bottom:22px;
+  }
+
+  .fase4-card{
+    background:var(--f4-white);
+    border:1px solid var(--f4-border);
+    border-radius:18px;
+    padding:20px;
+    box-shadow:var(--f4-shadow);
+  }
+
+  .fase4-card h3{
+    margin:0 0 12px 0;
+    color:var(--f4-azul);
+    font-size:1.04rem;
+    font-weight:800;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+
+  .fase4-card h3 .f4-icon{
+    width:28px;
+    height:28px;
+    background:var(--f4-cian-soft);
+    border-radius:8px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:0.95rem;
+  }
+
+  .fase4-card p{
+    margin:0 0 12px 0;
+    font-size:0.93rem;
+    line-height:1.65;
+    color:var(--f4-muted);
+  }
+
+  .fase4-list{
+    display:grid;
+    gap:12px;
+  }
+
+  .fase4-item{
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+    background:linear-gradient(180deg,#fbfdff 0%, #f4fbfc 100%);
+    border:1px solid rgba(0,156,166,0.14);
+    border-radius:16px;
+    padding:14px;
+    transition:transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .fase4-item:hover{
+    transform:translateX(4px);
+    box-shadow:0 10px 20px rgba(10,37,88,0.08);
+  }
+
+  .fase4-num{
+    width:30px;
+    height:30px;
+    min-width:30px;
+    border-radius:50%;
+    background:var(--f4-azul);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:0.82rem;
+    font-weight:800;
+  }
+
+  .fase4-item-body{ flex:1; }
+
+  .fase4-item-title{
+    font-weight:700;
+    font-size:0.95rem;
+    color:var(--f4-azul);
+    margin-bottom:4px;
+  }
+
+  .fase4-item-desc{
+    font-size:0.9rem;
+    color:var(--f4-muted);
+    line-height:1.55;
+  }
+
+  .fase4-note{
+    background:linear-gradient(90deg,var(--f4-cian-soft),#f0fbff);
+    border-left:4px solid var(--f4-cian);
+    border-radius:0 14px 14px 0;
+    padding:14px 16px;
+    font-size:0.93rem;
+    color:var(--f4-text);
+    line-height:1.6;
+    margin-bottom:22px;
+  }
+
+  .fase4-note strong{ color:var(--f4-azul); }
+
+  .fase4-topic{
+    background:linear-gradient(90deg,#0a2558,#143a7b);
+    color:#fff;
+    border-radius:16px;
+    padding:16px 18px;
+    margin-top:12px;
+    box-shadow:0 10px 24px rgba(10,37,88,0.16);
+  }
+
+  .fase4-topic-label{
+    display:block;
+    font-size:0.78rem;
+    text-transform:uppercase;
+    letter-spacing:0.8px;
+    font-weight:800;
+    opacity:0.82;
+    margin-bottom:8px;
+  }
+
+  .fase4-topic code{
+    font-family:'Consolas','Courier New',monospace;
+    font-size:0.92rem;
+    color:#c8f8ff;
+    word-break:break-word;
+  }
+
+  .fase4-json{
+    background:#0d1b2e;
+    border-radius:18px;
+    padding:18px 20px;
+    color:#e2f0ff;
+    box-shadow:0 16px 34px rgba(10,37,88,0.18);
+    margin-top:12px;
+    overflow-x:auto;
+  }
+
+  .fase4-json pre{
+    margin:0;
+    font-family:'Consolas','Courier New', monospace;
+    font-size:0.86rem;
+    line-height:1.7;
+    white-space:pre;
+  }
+
+  .fase4-code-wrap{
+    background:var(--f4-code-bg);
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 16px 34px rgba(10,37,88,0.18);
+    margin-bottom:22px;
+  }
+
+  .fase4-code-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:12px 18px;
+    background:rgba(255,255,255,0.05);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+  }
+
+  .fase4-code-title{
+    color:rgba(255,255,255,0.85);
+    font-size:0.82rem;
+    font-weight:700;
+    letter-spacing:0.5px;
+  }
+
+  .fase4-code-dots{
+    display:flex;
+    gap:6px;
+  }
+
+  .fase4-code-dots span{
+    width:12px;
+    height:12px;
+    border-radius:50%;
+  }
+
+  .fase4-code-dots span:nth-child(1){ background:#ff5f57; }
+  .fase4-code-dots span:nth-child(2){ background:#ffbd2e; }
+  .fase4-code-dots span:nth-child(3){ background:#28c840; }
+
+  .fase4-code-body{
+    overflow-x:auto;
+    padding:20px 22px;
+  }
+
+  .fase4-code-body pre{
+    margin:0;
+    font-family:'Consolas','Courier New', monospace;
+    font-size:0.87rem;
+    line-height:1.7;
+    color:var(--f4-code-text);
+    white-space:pre;
+  }
+
+  .f4c-comment{ color:#5f9ea0; font-style:italic; }
+  .f4c-keyword{ color:#c792ea; font-weight:700; }
+  .f4c-string { color:#c3e88d; }
+  .f4c-num    { color:#f78c6c; }
+  .f4c-func   { color:#82aaff; }
+
+  .fase4-gallery{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+    margin-bottom:22px;
+  }
+
+  .fase4-media-card{
+    background:#fff;
+    border:1px solid var(--f4-border);
+    border-radius:18px;
+    padding:16px;
+    box-shadow:var(--f4-shadow);
+  }
+
+  .fase4-media-card h4{
+    margin:0 0 10px 0;
+    color:var(--f4-azul);
+    font-size:0.96rem;
+    font-weight:800;
+  }
+
+  .fase4-media-card p{
+    margin:0 0 12px 0;
+    color:var(--f4-muted);
+    font-size:0.9rem;
+    line-height:1.55;
+  }
+
+  .fase4-media-card img{
+    width:100%;
+    border-radius:14px;
+    border:1px solid rgba(10,37,88,0.08);
+    margin-bottom:10px;
+  }
+
+  .fase4-caption{
+    font-size:0.82rem;
+    color:var(--f4-muted);
+    line-height:1.45;
+  }
+
+  .fase4-tooltip{
+    position:relative;
+    display:inline-flex;
+    align-items:center;
+    cursor:help;
+  }
+
+  .fase4-tooltip strong{
+    color:var(--f4-azul);
+    border-bottom:1px dashed rgba(0,156,166,0.55);
+    transition:color 0.25s ease, border-color 0.25s ease;
+  }
+
+  .fase4-tooltip:hover strong{
+    color:var(--f4-cian);
+    border-color:rgba(0,156,166,0.90);
+  }
+
+  .fase4-tooltip-box{
+    position:absolute;
+    left:50%;
+    bottom:calc(100% + 10px);
+    transform:translateX(-50%) translateY(6px);
+    min-width:220px;
+    max-width:290px;
+    padding:10px 12px;
+    border-radius:12px;
+    background:linear-gradient(180deg,#0d285d 0%, #143a7b 100%);
+    color:#fff;
+    font-size:0.82rem;
+    line-height:1.45;
+    font-weight:400;
+    box-shadow:0 10px 24px rgba(10,37,88,0.22);
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    z-index:100;
+    transition:opacity 0.22s ease, transform 0.22s ease, visibility 0.22s ease;
+  }
+
+  .fase4-tooltip-box:after{
+    content:"";
+    position:absolute;
+    top:100%;
+    left:50%;
+    transform:translateX(-50%);
+    border-width:7px;
+    border-style:solid;
+    border-color:#143a7b transparent transparent transparent;
+  }
+
+  .fase4-tooltip:hover .fase4-tooltip-box{
+    opacity:1;
+    visibility:visible;
+    transform:translateX(-50%) translateY(0);
+  }
+
+  @media (max-width: 900px){
+    .fase4-grid,
+    .fase4-gallery{
+      grid-template-columns:1fr;
+    }
+  }
+
+  @media (max-width: 640px){
+    .fase4-tooltip-box{
+      left:0;
+      transform:translateX(0) translateY(6px);
+      max-width:240px;
+    }
+
+    .fase4-tooltip-box:after{
+      left:22px;
+      transform:none;
+    }
+
+    .fase4-tooltip:hover .fase4-tooltip-box{
+      transform:translateX(0) translateY(0);
+    }
+  }
+</style>
+<div class="fase4-iot">
+<div class="fase4-shell">
+<div class="fase4-hero"><span class="fase4-kicker">📤 Fase 4 · 2–3 sesiones</span>
+<h2>Envío de datos vía MQTT</h2>
+<p>Después de comprender qué son IoT, WiFi, MQTT y JSON, llega el momento de poner en práctica esa arquitectura. En esta fase el ESP8266 se conecta a la red, genera un mensaje con los datos del sensor y lo publica en un tópico MQTT para que pueda ser recibido desde otro cliente.</p>
+<div class="fase4-pill-row"><span class="fase4-pill">WiFi</span> <span class="fase4-pill">Broker</span> <span class="fase4-pill">PubSubClient</span> <span class="fase4-pill">Topic</span> <span class="fase4-pill">Payload</span> <span class="fase4-pill">JSON</span></div>
+</div>
+<div class="fase4-note"><strong>Conexión con la Fase 3:</strong> antes aprendiste qué era un broker, qué significaba publicar en un tópico y por qué JSON era útil para estructurar la información. Ahora vas a ver cómo esas ideas se convierten en código funcional dentro del ESP8266. </div>
+<div class="fase4-grid">
+<div class="fase4-card">
+<h3><span class="f4-icon">🌐</span>Redes y comunicación</h3>
+<p>Para enviar datos, el microcontrolador necesita conectarse primero a una red <span class="fase4-tooltip"><strong>WiFi</strong><span class="fase4-tooltip-box">Red inalámbrica local que permite que el ESP8266 se comunique con otros equipos, como el broker MQTT o el ordenador donde corre Node-RED.</span></span>. Una vez conectado, el dispositivo obtiene una dirección IP y puede abrir una conexión con el broker usando una IP o un nombre de host y un <span class="fase4-tooltip"><strong>puerto</strong><span class="fase4-tooltip-box">Número que identifica un servicio concreto dentro de un servidor. La IP indica qué equipo queremos localizar y el puerto señala qué servicio debe responder, por ejemplo MQTT en el puerto 1883.</span></span> concreto.</p>
+<p><a href="ess8266_init.png" rel="lightbox"><img src="ess8266_init.png" alt="Iniciamos esp8266" width="1480" height="402" /></a></p>
+<p>En este proyecto se trabaja con un broker MQTT y con la librería <span class="fase4-tooltip"><strong>PubSubClient</strong><span class="fase4-tooltip-box">Librería de Arduino muy usada para trabajar con MQTT. Permite conectarse al broker, publicar mensajes y suscribirse a tópicos.</span></span>, que se encarga de gestionar la comunicación entre el ESP8266 y el servidor. </p>
+</div>
+<div class="fase4-card">
+<h3><span class="f4-icon">⚙️</span>Secuencia del envío</h3>
+<div class="fase4-list">
+<div class="fase4-item">
+<div class="fase4-num">1</div>
+<div class="fase4-item-body">
+<div class="fase4-item-title">Conectar a WiFi</div>
+<div class="fase4-item-desc">El ESP8266 se conecta a la red con su SSID y contraseña.</div>
+</div>
+</div>
+<div class="fase4-item">
+<div class="fase4-num">2</div>
+<div class="fase4-item-body">
+<div class="fase4-item-title">Conectar al broker MQTT</div>
+<div class="fase4-item-desc">Se define el servidor, el puerto y el identificador del cliente.</div>
+</div>
+</div>
+<div class="fase4-item">
+<div class="fase4-num">3</div>
+<div class="fase4-item-body">
+<div class="fase4-item-title">Leer el sensor</div>
+<div class="fase4-item-desc">Se obtienen temperatura, presión y altitud desde el BMP280.</div>
+</div>
+</div>
+<div class="fase4-item">
+<div class="fase4-num">4</div>
+<div class="fase4-item-body">
+<div class="fase4-item-title">Crear el JSON</div>
+<div class="fase4-item-desc">Los datos se estructuran en un payload con claves y valores.</div>
+</div>
+</div>
+<div class="fase4-item">
+<div class="fase4-num">5</div>
+<div class="fase4-item-body">
+<div class="fase4-item-title">Publicar en el tópico</div>
+<div class="fase4-item-desc">El mensaje se envía al broker para que otros clientes lo reciban.</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="fase4-grid">
+<div class="fase4-card">
+<h3><span class="f4-icon">🧭</span>Ejemplo de tópico</h3>
+<p>Un <span class="fase4-tooltip"><strong>tópico</strong><span class="fase4-tooltip-box">Ruta jerárquica que organiza los mensajes dentro del broker MQTT. Permite separar información por dispositivo, tipo de dato o proyecto.</span></span> funciona como una dirección lógica donde se publica la información. En el código del proyecto se construye con una cadena que incluye la categoría del nodo y el identificador del dispositivo. </p>
+<p><a href="mqttin_config.png" rel="lightbox"><img src="mqttin_config.png" alt="Configuración MQTT" width="621" height="533" /></a></p>
+<div class="fase4-topic"><span class="fase4-topic-label">Topic de publicación</span> <code>cabrerapinto/meteorologia/esp8266-id/bmp280</code></div>
+</div>
+<div class="fase4-card">
+<h3><span class="f4-icon">📦</span>Ejemplo de payload JSON</h3>
+<p>El <span class="fase4-tooltip"><strong>payload</strong><span class="fase4-tooltip-box">Parte útil del mensaje MQTT. En este caso contiene información del ESP8266 y del sensor BMP280 en formato JSON.</span></span> que se envía al broker contiene información del dispositivo y del sensor. Esta estructura permite que el cliente suscriptor identifique fácilmente qué datos debe leer y cómo debe interpretarlos. </p>
+<div class="fase4-json">
+<pre>{
+  "esp": {
+    "ip": "192.168.1.48",
+    "rssi": -56,
+    "timestamp": 35420
+  },
+  "sensor": {
+    "name": "BMP280",
+    "temperatura_c": 23.4,
+    "presion_hpa": 1012.8,
+    "altitud_m": 12.1
+  }
+}</pre>
+</div>
+</div>
+</div>
+<div class="fase4-code-wrap">
+<div class="fase4-code-header">
+<div class="fase4-code-dots"><span></span><span></span><span></span></div>
+<span class="fase4-code-title">Fragmento del proyecto · Conexión WiFi, MQTT y publicación</span></div>
+<div class="fase4-code-body">
+<pre><span class="f4c-comment">// Conexión a la red WiFi</span>
+<span class="f4c-keyword">void</span> <span class="f4c-func">wifiConnect</span>() {
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+
+  <span class="f4c-keyword">while</span> (WiFi.status() != WL_CONNECTED) {
+    delay(<span class="f4c-num">300</span>);
+    Serial.print(<span class="f4c-string">"."</span>);
+  }
+
+  Serial.printf(<span class="f4c-string">"[WiFi] OK IP=%s RSSI=%d\n"</span>,
+                WiFi.localIP().toString().c_str(),
+                WiFi.RSSI());
+}
+
+<span class="f4c-comment">// Reconexión al broker MQTT</span>
+<span class="f4c-keyword">void</span> <span class="f4c-func">reconnectMQTT</span>() {
+  String clientId = <span class="f4c-string">"ESP8266Client-"</span> + String(ESP.getChipId());
+
+  <span class="f4c-keyword">while</span> (!client.connected()) {
+    <span class="f4c-keyword">if</span> (client.connect(clientId.c_str())) {
+      Serial.println(<span class="f4c-string">"[MQTT] connected"</span>);
+    } <span class="f4c-keyword">else</span> {
+      Serial.println(<span class="f4c-string">"[MQTT] retry"</span>);
+      delay(<span class="f4c-num">5000</span>);
+    }
+  }
+}
+
+<span class="f4c-comment">// Lectura del sensor y publicación del JSON</span>
+<span class="f4c-keyword">void</span> <span class="f4c-func">sendToBroker</span>() {
+  float tempC   = bmp.readTemperature();
+  float pressHP = bmp.readPressure() / <span class="f4c-num">100.0</span>;
+  float altM    = bmp.readAltitude(SEALEVELPRESSURE_HPA);
+
+  DynamicJsonDocument doc(<span class="f4c-num">1024</span>);
+  JsonObject values = doc.createNestedObject(<span class="f4c-string">"sensor"</span>);
+  values[<span class="f4c-string">"name"</span>] = <span class="f4c-string">"BMP280"</span>;
+  values[<span class="f4c-string">"temperatura_c"</span>] = tempC;
+  values[<span class="f4c-string">"presion_hpa"</span>] = pressHP;
+  values[<span class="f4c-string">"altitud_m"</span>] = altM;
+
+  char payload[<span class="f4c-num">1024</span>];
+  serializeJson(doc, payload, sizeof(payload));
+
+  client.publish(send_topic, payload);
+}</pre>
+</div>
+</div>
+<div class="fase4-note"><strong>Comprobación práctica:</strong> el envío puede verificarse de dos maneras. Primero, observando en el monitor serie si aparecen mensajes de conexión y publicación; segundo, utilizando un cliente suscriptor para comprobar si el tópico recibe correctamente el payload. Esta comprobación forma parte de la lógica de depuración descrita en la secuencia didáctica de la unidad. </div>
+<div class="fase4-card">
+<h3><span class="f4-icon">🧪</span>Qué debes comprobar</h3>
+<div class="fase4-list">
+<div class="fase4-item">
+<div class="fase4-num">1</div>
+<div class="fase4-item-body">
+<div class="fase4-item-title">La red WiFi conecta correctamente</div>
+<div class="fase4-item-desc">El monitor serie debe mostrar una IP local y un valor de RSSI.</div>
+</div>
+</div>
+<div class="fase4-item">
+<div class="fase4-num">2</div>
+<div class="fase4-item-body">
+<div class="fase4-item-title">El broker acepta la conexión</div>
+<div class="fase4-item-desc">Debe aparecer un mensaje de conexión MQTT correcta o de reintento si falla.</div>
+</div>
+</div>
+<div class="fase4-item">
+<div class="fase4-num">3</div>
+<div class="fase4-item-body">
+<div class="fase4-item-title">El tópico recibe el mensaje</div>
+<div class="fase4-item-desc">El payload JSON debe llegar completo al cliente suscriptor.</div>
+</div>
+</div>
+<div class="fase4-item">
+<div class="fase4-num">4</div>
+<div class="fase4-item-body">
+<div class="fase4-item-title">Los datos tienen sentido</div>
+<div class="fase4-item-desc">La temperatura, la presión y la altitud deben ser coherentes con el entorno de prueba.</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></div>
+</div>
+</div>
+</article>
+<div id="packageLicense" class="cc cc-by-sa">
+<p><span>Obra publicada con</span> <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Licencia Creative Commons Reconocimiento Compartir igual 4.0</a></p>
+</div>
+</section>
+</div>
+<div id='bottomPagination'>
+<nav class="pagination noprt">
+<a href="fase_3_iot_wifi_mqtt_y_json.html" class="prev"><span><span>&laquo; </span>Anterior</span></a> <span class="sep">| </span><a href="fase_5_nodered_y_dashboard.html" class="next"><span>Siguiente<span> &raquo;</span></span></a>
+</nav>
+</div>
+<footer id="siteFooter">Daniel Rodríguez Carrión | REA para Tecnología e Ingeniería | Curso 2025-2026 | Licencia CC </footer></div>
+<p id="made-with-eXe"><a href="https://exelearning.net/" target="_blank" rel="noopener"><span>Creado con eXeLearning<span> (Ventana nueva)</span></span></a></p><script type="text/javascript" src="_intef_js.js"></script></body></html>

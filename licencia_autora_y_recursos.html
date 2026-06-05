@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="es">
+<head>
+<link rel="stylesheet" type="text/css" href="base.css" />
+<link rel="stylesheet" type="text/css" href="content.css" />
+<link rel="stylesheet" type="text/css" href="nav.css" />
+<meta http-equiv="content-type" content="text/html;  charset=utf-8" />
+<title>Licencia, autoría y recursos | Estación meteorológica IoT con ESP8266, BMP280 y MQTT </title>
+<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+<meta name="author" content="Daniel Rodríguez Carrión" />
+<link rel="license" type="text/html" href="http://creativecommons.org/licenses/by-sa/4.0/" />
+<meta name="generator" content="eXeLearning 2.9 - exelearning.net" />
+<!--[if lt IE 9]><script type="text/javascript" src="exe_html5.js"></script><![endif]-->
+<script type="text/javascript" src="exe_jquery.js"></script>
+<script type="text/javascript" src="common_i18n.js"></script>
+<script type="text/javascript" src="common.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* ESTILOS PARA COPIAR EN EL EDITOR DE EXELEARNING */
+        .container-header-iot {
+            --color-unam-azul: #0a2558;
+            --color-unam-cian: #009ca6;
+            --bg-gradient: linear-gradient(135deg, var(--color-unam-azul) 0%, #1a3a7a 50%, var(--color-unam-cian) 100%);
+            
+            width: 100%;
+            margin: 0 auto 25px auto;
+            background: var(--bg-gradient);
+            border-radius: 15px;
+            overflow: hidden;
+            color: white;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            box-shadow: 0 10px 30px rgba(0, 156, 166, 0.25);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-top {
+            display: flex;
+            padding: 30px 40px;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-info {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .header-info .subject {
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #b3e6ec;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .header-info h1 {
+            margin: 0;
+            font-size: 2.4rem;
+            font-weight: 800;
+            line-height: 1.1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header-info p.tagline {
+            margin: 10px 0 0 0;
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 300;
+        }
+
+        .header-logo-box {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+
+        .header-logo-box:hover {
+            transform: scale(1.03);
+        }
+
+        .header-logo-box img {
+            height: 65px;
+            width: auto;
+            display: block;
+        }
+
+        .header-bottom {
+            background: rgba(0, 0, 0, 0.15);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .tech-stack {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Recuperación de los tags con efectos de hover */
+        .tech-pill {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(4px);
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .tech-pill:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
+        .project-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #e0faff;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Efecto de red de fondo decorativo */
+        .header-pattern {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .header-top { padding: 20px; }
+            .header-bottom { padding: 15px 20px; }
+            .header-info h1 { font-size: 1.8rem; }
+            .header-logo-box img { height: 50px; }
+            .project-meta { width: 100%; justify-content: space-between; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- BLOQUE HTML PARA PEGAR EN EL iDEVICE DE EXELARNING -->
+    <div class="container-header-iot" style="position: relative;">
+        <div class="header-pattern"></div>
+        
+        <div class="header-top">
+            <div class="header-info">
+                <span class="subject">Tecnología e Ingeniería I • Bachillerato</span>
+                <h1>Estación Meteorológica IoT</h1>
+                <p class="tagline">Diseño, Programación y Ética en la Cultura Maker</p>
+                
+                <div class="tech-stack" style="margin-top: 22px;">
+                    <span class="tech-pill">ESP8266</span>
+                    <span class="tech-pill">BMP280</span>
+                    <span class="tech-pill">MQTT / JSON</span>
+                    <span class="tech-pill">Node-RED</span>
+                </div>
+            </div>
+            
+            <div class="header-logo-box">
+                <!-- Enlace actualizado con el logo de la Universidad del Atlántico Medio -->
+                <img src="https://www.universidadatlanticomedio.es/img/logo/UNAM_logo.png" alt="Logotipo Universidad del Atlántico Medio">
+            </div>
+        </div>
+
+        <div class="header-bottom">
+            <div class="project-meta">
+                <div class="meta-item">
+                    <span>📡 <b>Fase:</b> Prototipado y Comunicaciones</span>
+                </div>
+                <div class="meta-item">
+                    <span>💡 <b>Metodología:</b> ABP</span>
+                </div>
+            </div>
+            <div style="font-size: 0.75rem; opacity: 0.7; letter-spacing: 0.5px;">
+                RECURSO EDUCATIVO ABIERTO (REA)
+            </div>
+        </div>
+    </div>
+    <!-- FIN DEL BLOQUE HTML -->
+
+</body>
+</html></head>
+<body class="exe-web-site" id="exe-node-18"><script type="text/javascript">document.body.className+=" js"</script>
+<div id="content">
+<p id="skipNav"><a href="#main" class="sr-av">Saltar la navegación</a></p>
+<header id="header" ><div id="headerContent">Estación meteorológica IoT con ESP8266, BMP280 y MQTT</div></header>
+<nav id="siteNav">
+<ul>
+   <li><a href="index.html" class="daddy main-node">Inicio</a></li>
+   <li><a href="gua_didctica.html" class="no-ch">Guía didáctica</a></li>
+   <li><a href="introduccin_al_proyecto.html" class="daddy">Introducción al proyecto</a>
+   <ul class="other-section">
+      <li><a href="fase_1_electrnica_y_soldadura.html" class="no-ch">Fase 1. Electrónica y soldadura</a></li>
+      <li><a href="fase_2_lectura_local_del_sensor.html" class="no-ch">Fase 2. Lectura local del sensor</a></li>
+      <li><a href="fase_3_iot_wifi_mqtt_y_json.html" class="no-ch">Fase 3. IoT, WiFi, MQTT y JSON</a></li>
+      <li><a href="fase_4_envo_de_datos_va_mqtt.html" class="no-ch">Fase 4. Envío de datos vía MQTT</a></li>
+      <li><a href="fase_5_nodered_y_dashboard.html" class="no-ch">Fase 5. Node-RED y dashboard</a></li>
+      <li><a href="fase_6_anlisis_reflexin_y_entrega.html" class="no-ch">Fase 6. Análisis, reflexión y entrega</a></li>
+   </ul>
+   </li>
+   <li><a href="actividades_interactivas.html" class="no-ch">Actividades interactivas</a></li>
+   <li id="active"><a href="licencia_autora_y_recursos.html" class="active no-ch">Licencia, autoría y recursos</a></li>
+</ul>
+</nav>
+<div id='topPagination'>
+<nav class="pagination noprt">
+<a href="actividades_interactivas.html" class="prev"><span><span>&laquo; </span>Anterior</span></a>
+</nav>
+</div>
+<div id="main-wrapper">
+<section id="main">
+<header id="nodeDecoration"><h1 id="nodeTitle">Licencia, autoría y recursos</h1></header>
+<article class="iDevice_wrapper textIdevice" id="id16">
+<div class="iDevice emphasis0" >
+<div id="ta16_142_2" class="block iDevice_content">
+<div class="exe-text"><style>
+  :root {
+    --az:#0a2558; --az2:#143a7b; --az3:#1a4a9a;
+    --ro:#c0392b; --ro2:#a93226; --ro-soft:#fdf0ee;
+    --ve:#1a7a4a; --ve-soft:#edf7f1;
+    --ci:#009ca6; --ci-soft:#e6f8f9;
+    --na:#d97a00; --na-soft:#fef8ee;
+    --bg:#f4f8fc; --wh:#ffffff;
+    --tx:#18314f; --mt:#5d7690;
+    --bd:rgba(10,37,88,0.10);
+    --sh:0 12px 28px rgba(10,37,88,0.08);
+  }
+  .lra, .lra * { box-sizing:border-box !important; }
+  .lra { font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif; color:var(--tx); margin:0 0 30px 0; }
+  .lra-shell { background:linear-gradient(180deg,#f8fbfe,#eef5fb); border:1px solid rgba(10,37,88,0.06); border-radius:22px; padding:26px; box-shadow:var(--sh); }
+
+  /* HEROES */
+  .lra-hero { border-radius:22px; padding:28px; margin-bottom:22px; position:relative; overflow:hidden; box-shadow:0 16px 34px rgba(10,37,88,0.16); }
+  .lra-hero:before { content:""; position:absolute; inset:0; background-image:radial-gradient(rgba(255,255,255,0.09) 1px,transparent 1px); background-size:18px 18px; pointer-events:none; }
+  .lra-hero > * { position:relative; z-index:1; }
+  .lra-hero-lic { background:linear-gradient(135deg,#6d1a8a 0%,#0a2558 100%); color:#fff; }
+  .lra-hero-rec { background:linear-gradient(135deg,#0a2558 0%,#009ca6 100%); color:#fff; }
+  .lra-kicker { display:inline-block !important; padding:7px 14px; background:rgba(255,255,255,0.14); border:1px solid rgba(255,255,255,0.22); border-radius:999px; font-size:0.78rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; margin-bottom:14px; }
+  .lra-hero h2 { margin:0 0 10px 0; font-size:1.75rem; line-height:1.1; font-weight:800; }
+  .lra-hero p { margin:0; font-size:0.97rem; line-height:1.7; color:rgba(255,255,255,0.91); max-width:680px; }
+
+  /* SECTION TITLE */
+  .lra-st { display:flex !important; align-items:center; gap:10px; font-size:1.05rem; font-weight:800; color:var(--az); margin:22px 0 16px 0; padding-bottom:10px; border-bottom:2px solid rgba(10,37,88,0.08); }
+  .lra-badge { color:#fff; border-radius:999px; padding:4px 12px; font-size:0.78rem; font-weight:800; }
+
+  /* CC BLOCK */
+  .lra-cc-main { background:var(--wh); border:1px solid var(--bd); border-radius:20px; padding:22px; margin-bottom:18px; box-shadow:var(--sh); }
+  .lra-cc-top { display:flex !important; align-items:flex-start; gap:20px; flex-wrap:wrap; }
+  .lra-cc-logo { flex-shrink:0; background:linear-gradient(135deg,#f3e8ff,#e8f0ff); border-radius:16px; padding:18px 22px; text-align:center; border:1px solid rgba(109,26,138,0.15); }
+  .lra-cc-logo-icons { font-size:2.2rem; letter-spacing:4px; display:block; margin-bottom:6px; }
+  .lra-cc-logo-name { font-size:0.85rem; font-weight:800; color:#6d1a8a; }
+  .lra-cc-logo-full { font-size:0.76rem; color:var(--mt); margin-top:3px; }
+  .lra-cc-info { flex:1; min-width:220px; }
+  .lra-cc-info h3 { margin:0 0 10px 0; font-size:1.05rem; font-weight:800; color:var(--az); }
+  .lra-cc-info p { margin:0 0 10px 0; font-size:0.93rem; line-height:1.65; color:var(--mt); }
+  .lra-cc-link-wrap { margin-top:4px; }
+  .lra-cc-link { display:inline-flex !important; width:fit-content !important; align-items:center; gap:8px; padding:8px 16px; background:linear-gradient(135deg,#6d1a8a,#0a2558); color:#fff !important; border-radius:999px; font-size:0.83rem; font-weight:700; text-decoration:none !important; transition:transform 0.2s,box-shadow 0.2s; }
+  .lra-cc-link:hover { transform:translateY(-2px); box-shadow:0 8px 18px rgba(109,26,138,0.25); }
+
+  /* CC PERMISOS */
+  .lra-cc-perms { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:16px; }
+  .lra-perm { border-radius:14px; padding:14px; text-align:center; }
+  .lra-perm-si { background:var(--ve-soft); border:1px solid rgba(26,122,74,0.2); }
+  .lra-perm-no { background:var(--ro-soft); border:1px solid rgba(192,57,43,0.15); }
+  .lra-perm-icon { font-size:1.5rem; display:block; margin-bottom:6px; }
+  .lra-perm-title { font-size:0.86rem; font-weight:800; }
+  .lra-perm-si .lra-perm-title { color:var(--ve); }
+  .lra-perm-no .lra-perm-title { color:var(--ro); }
+  .lra-perm-desc { font-size:0.78rem; color:var(--mt); line-height:1.4; margin-top:4px; }
+  .lra-perm-cond { grid-column:span 3; display:flex !important; align-items:center; gap:12px; text-align:left; }
+
+  /* AUTOR */
+  .lra-autor { background:var(--wh); border:1px solid var(--bd); border-radius:20px; padding:22px; margin-bottom:18px; box-shadow:var(--sh); }
+  .lra-autor-top { display:flex !important; align-items:center; gap:16px; margin-bottom:16px; flex-wrap:wrap; }
+  .lra-avatar { width:64px; height:64px; border-radius:50%; background:linear-gradient(135deg,#0a2558,#143a7b); color:#fff; display:flex !important; align-items:center; justify-content:center; font-size:1.6rem; font-weight:800; flex-shrink:0; border:3px solid rgba(255,255,255,0.8); box-shadow:var(--sh); }
+  .lra-autor-meta { flex:1; }
+  .lra-autor-meta h3 { margin:0 0 4px 0; font-size:1.1rem; font-weight:800; color:var(--az); }
+  .lra-autor-meta .lra-rol { font-size:0.88rem; color:var(--mt); }
+  .lra-autor-links { display:flex !important; gap:10px; flex-wrap:wrap; margin-top:8px; }
+  .lra-alink { display:inline-flex !important; width:fit-content !important; align-items:center; gap:6px; padding:6px 14px; border-radius:999px; font-size:0.82rem; font-weight:700; text-decoration:none !important; border:1px solid var(--bd); transition:transform 0.2s,box-shadow 0.2s; }
+  .lra-alink:hover { transform:translateY(-2px); box-shadow:0 6px 14px rgba(10,37,88,0.1); }
+  .lra-alink-gh { background:#0d1b2e; color:#fff !important; border-color:#0d1b2e; }
+  .lra-autor-context { font-size:0.91rem; line-height:1.65; color:var(--mt); border-top:1px solid var(--bd); padding-top:14px; }
+
+  /* DECLARACION IA */
+  .lra-ia { background:linear-gradient(135deg,#1a1a2e,#16213e); border-radius:18px; padding:20px; margin-bottom:22px; }
+  .lra-ia-header { display:flex !important; align-items:center; gap:12px; margin-bottom:14px; }
+  .lra-ia-icon { width:38px; height:38px; background:rgba(255,255,255,0.1); border-radius:10px; display:flex !important; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0; }
+  .lra-ia-title { color:#e2f0ff; font-size:1rem; font-weight:800; }
+  .lra-ia-sub { color:rgba(255,255,255,0.55); font-size:0.82rem; }
+  .lra-ia-text { color:rgba(255,255,255,0.82); font-size:0.91rem; line-height:1.7; border-left:3px solid rgba(255,255,255,0.2); padding-left:14px; margin-bottom:0; }
+  .lra-ia-tags { display:flex !important; flex-wrap:wrap; gap:8px; margin-top:14px; }
+  .lra-ia-tag { display:inline-block !important; padding:5px 12px; border-radius:999px; font-size:0.78rem; font-weight:700; }
+  .lra-ia-tag-si { background:rgba(26,122,74,0.25); color:#6ddd9a; border:1px solid rgba(26,122,74,0.3); }
+  .lra-ia-tag-no { background:rgba(192,57,43,0.2); color:#f8a09a; border:1px solid rgba(192,57,43,0.25); }
+
+  /* SEPARATOR */
+  .lra-sep { border:none; border-top:2px dashed rgba(10,37,88,0.10); margin:28px 0; }
+
+  /* REPO PRINCIPAL — ahora es un <div> con <a> interno, no un <a> bloque */
+  .lra-repo-box { display:flex !important; align-items:center; gap:16px; background:linear-gradient(135deg,#0d1b2e,#1a2e48); border-radius:18px; padding:18px 22px; margin-bottom:18px; border:2px solid rgba(255,255,255,0.08); }
+  .lra-repo-box-ico { font-size:1.6rem; flex-shrink:0; }
+  .lra-repo-box-text { flex:1; }
+  .lra-repo-box-text strong { display:block; color:#fff; font-size:1.02rem; font-weight:800; margin-bottom:4px; }
+  .lra-repo-box-text span { color:rgba(255,255,255,0.6); font-size:0.85rem; }
+  .lra-repo-box-link { display:inline-flex !important; width:fit-content !important; align-items:center; gap:8px; margin-top:10px; padding:7px 16px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); border-radius:999px; color:#fff !important; font-size:0.83rem; font-weight:700; text-decoration:none !important; transition:background 0.2s; }
+  .lra-repo-box-link:hover { background:rgba(255,255,255,0.2); }
+
+  /* RECURSOS GRID */
+  .lra-rec-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:18px; }
+  .lra-rec-card { background:var(--wh); border:1px solid var(--bd); border-radius:16px; overflow:hidden; box-shadow:var(--sh); }
+  .lra-rec-header { padding:14px 16px 12px; display:flex !important; align-items:center; gap:10px; }
+  .lra-rec-ico { width:38px; height:38px; border-radius:10px; display:flex !important; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0; }
+  .lra-rec-htitle { font-size:0.9rem; font-weight:800; color:var(--az); }
+  .lra-rec-hsub { font-size:0.76rem; color:var(--mt); }
+  .lra-rec-links { padding:0 16px 16px; display:grid; gap:8px; }
+
+  /* CADA ENLACE: estructura plana, todo dentro del <a> */
+  .lra-rlink { display:flex !important; width:100% !important; align-items:center; gap:10px; padding:10px 14px; border-radius:12px; border:1px solid var(--bd); background:var(--bg); text-decoration:none !important; transition:background 0.18s; }
+  .lra-rlink:hover { background:var(--ci-soft); }
+  .lra-rlink-bullet { width:8px; height:8px; min-width:8px; border-radius:50%; flex-shrink:0; }
+  .lra-rlink-body { flex:1; min-width:0; }
+  .lra-rlink-title { font-size:0.88rem; font-weight:700; color:var(--az); display:block; line-height:1.35; }
+  .lra-rlink-desc { font-size:0.78rem; color:var(--mt); display:block; margin-top:2px; line-height:1.35; }
+  .lra-rlink-arrow { font-size:0.85rem; color:var(--mt); flex-shrink:0; font-style:normal; }
+
+  /* NOTE */
+  .lra-note { background:linear-gradient(90deg,var(--ci-soft),#f0fbff); border-left:4px solid var(--ci); border-radius:0 14px 14px 0; padding:13px 16px; font-size:0.91rem; color:var(--tx); line-height:1.6; margin-bottom:18px; }
+  .lra-note strong { color:var(--az); }
+
+  @media (max-width:860px) {
+    .lra-rec-grid { grid-template-columns:1fr; }
+    .lra-cc-perms { grid-template-columns:1fr 1fr; }
+  }
+  @media (max-width:540px) {
+    .lra-cc-perms { grid-template-columns:1fr; }
+    .lra-cc-top { flex-direction:column; }
+    .lra-perm-cond { flex-direction:column; }
+  }
+</style>
+<div class="lra">
+<div class="lra-shell"><!-- ══════════════════ BLOQUE A: LICENCIA Y AUTORÍA ══════════════════ -->
+<div class="lra-hero lra-hero-lic"><span class="lra-kicker">⚖️ Licencia y autoría</span>
+<h2>Este recurso es libre, abierto y reutilizable</h2>
+<p>El REA y el código fuente del proyecto se distribuyen con licencias abiertas para que cualquier docente o alumno pueda usar, adaptar y compartir el material, siempre que se mantengan las condiciones de atribución.</p>
+</div>
+<!-- LICENCIA CC -->
+<div class="lra-st"><span>🔓</span> Licencia del recurso educativo <span class="lra-badge" style="background: #6d1a8a;">Creative Commons</span></div>
+<div class="lra-cc-main">
+<div class="lra-cc-top">
+<div class="lra-cc-logo"><span class="lra-cc-logo-icons">🅭🅱</span>
+<div class="lra-cc-logo-name">CC BY 4.0</div>
+<div class="lra-cc-logo-full">Creative Commons<br />Atribución 4.0 Internacional</div>
+</div>
+<div class="lra-cc-info">
+<h3>Creative Commons Atribución 4.0 Internacional (CC BY 4.0)</h3>
+<p>Esta licencia permite copiar, redistribuir, adaptar, transformar y construir sobre este material para cualquier propósito, incluso comercial, siempre que se otorgue la atribución correcta al autor original.</p>
+<p>Es la licencia más abierta del ecosistema Creative Commons y la más recomendada para recursos educativos abiertos (REA/OER) porque maximiza la difusión y el impacto del conocimiento.</p>
+<div class="lra-cc-link-wrap"><a class="lra-cc-link" href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener noreferrer">🔗 Ver texto completo de la licencia</a></div>
+</div>
+</div>
+<div class="lra-cc-perms">
+<div class="lra-perm lra-perm-si"><span class="lra-perm-icon">✅</span>
+<div class="lra-perm-title">Compartir</div>
+<div class="lra-perm-desc">Puedes copiar y redistribuir el material en cualquier medio o formato</div>
+</div>
+<div class="lra-perm lra-perm-si"><span class="lra-perm-icon">✅</span>
+<div class="lra-perm-title">Adaptar</div>
+<div class="lra-perm-desc">Puedes remezclar, transformar y crear a partir del material para cualquier propósito</div>
+</div>
+<div class="lra-perm lra-perm-si"><span class="lra-perm-icon">✅</span>
+<div class="lra-perm-title">Uso comercial</div>
+<div class="lra-perm-desc">Incluso con fines comerciales, respetando siempre la atribución</div>
+</div>
+<div class="lra-perm lra-perm-no lra-perm-cond"><span class="lra-perm-icon" style="font-size: 1.2rem; margin-bottom: 0; flex-shrink: 0;">⚠️</span>
+<div>
+<div class="lra-perm-title" style="color: #a93226;">Condición obligatoria: Atribución</div>
+<div class="lra-perm-desc">Debes dar crédito al autor, indicar si se realizaron cambios y proporcionar un enlace a la licencia. No puedes sugerir que el autor respalda tu uso.</div>
+</div>
+</div>
+</div>
+</div>
+<!-- LICENCIA CÓDIGO -->
+<div class="lra-note"><strong>Licencia del código fuente:</strong> el código Arduino/C++ del repositorio se distribuye bajo licencia <strong>MIT</strong>, lo que permite su uso, copia, modificación y distribución sin restricciones, incluyendo proyectos privados y comerciales, con la única condición de mantener el aviso de copyright.</div>
+<!-- AUTORÍA -->
+<div class="lra-st"><span>👤</span> Autoría del proyecto <span class="lra-badge" style="background: var(--az3);">Docente</span></div>
+<div class="lra-autor">
+<div class="lra-autor-top">
+<div class="lra-avatar">D</div>
+<div class="lra-autor-meta">
+<h3>Daniel Rodríguez Carrión</h3>
+<div class="lra-rol">Máster en Educación · Ingeniería en Electrónica, Robótica y Mecatrónica</div>
+<div class="lra-autor-links"><a class="lra-alink lra-alink-gh" href="https://github.com/DaniCampusIoT" target="_blank" rel="noopener noreferrer"> <svg width="14" height="14" viewbox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"></path></svg> DaniCampusIoT </a></div>
+</div>
+</div>
+<div class="lra-autor-context">Recurso educativo desarrollado como parte del <strong>Máster en Educación (MAES)</strong> en la Universidad del Atlántico Medio, para la asignatura Aprendizaje y Enseñanzas de Tecnología II. El proyecto está diseñado para alumnado de <strong>1.º de Bachillerato</strong> en la materia de Tecnología e Ingeniería, dentro del contexto del IES Cabrerita Pinto, La Laguna, Canarias.</div>
+</div>
+<!-- DECLARACION IA -->
+<div class="lra-st"><span>🤖</span> Declaración de uso de inteligencia artificial <span class="lra-badge" style="background: #1a1a2e;">Transparencia</span></div>
+<div class="lra-ia">
+<div class="lra-ia-header">
+<div class="lra-ia-icon">🤖</div>
+<div>
+<div class="lra-ia-title">Uso de IA en la elaboración de este recurso</div>
+<div class="lra-ia-sub">Declaración conforme a la normativa de la Universidad del Atlántico Medio</div>
+</div>
+</div>
+<div class="lra-ia-text">En la elaboración de este recurso se han utilizado herramientas de inteligencia artificial como apoyo puntual para reorganizar contenidos, mejorar la redacción de algunos apartados y proponer estructuras de actividades interactivas para eXeLearning. La selección de contenidos técnicos, el diseño didáctico, el código fuente del proyecto, la revisión técnica de todos los apartados y la versión final del REA han sido realizados y supervisados críticamente por el autor. El uso de IA se ha limitado a tareas de apoyo en la presentación del material, no en la generación del conocimiento técnico ni en las decisiones pedagógicas del recurso.</div>
+<div class="lra-ia-tags"><span class="lra-ia-tag lra-ia-tag-si">✓ Reorganización de contenidos</span> <span class="lra-ia-tag lra-ia-tag-si">✓ Mejora de redacción</span> <span class="lra-ia-tag lra-ia-tag-si">✓ Estructura de actividades</span> <span class="lra-ia-tag lra-ia-tag-no">✗ Código fuente (100% propio)</span> <span class="lra-ia-tag lra-ia-tag-no">✗ Decisiones pedagógicas</span> <span class="lra-ia-tag lra-ia-tag-no">✗ Contenido técnico original</span></div>
+</div>
+<hr class="lra-sep" /><!-- ══════════════════ BLOQUE B: RECURSOS Y ENLACES ══════════════════ -->
+<div class="lra-hero lra-hero-rec"><span class="lra-kicker">🔗 Recursos y enlaces</span>
+<h2>Todo lo que necesitas para el proyecto</h2>
+<p>Documentación oficial, herramientas de software, materiales de referencia y el repositorio completo del proyecto con código fuente, imágenes y flujos de Node-RED listos para usar.</p>
+</div>
+<!-- REPO PRINCIPAL: DIV contenedor + <a> interno para el botón -->
+<div class="lra-repo-box">
+<div class="lra-repo-box-ico"><svg width="36" height="36" viewbox="0 0 24 24" fill="white"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"></path></svg></div>
+<div class="lra-repo-box-text"><strong>Repositorio del proyecto · DaniCampusIoT</strong> <span>Código fuente Arduino, flujos Node-RED, capturas y documentación completa</span> <a class="lra-repo-box-link" href="https://github.com/DaniCampusIoT" target="_blank" rel="noopener noreferrer">Abrir en GitHub ↗</a></div>
+</div>
+<!-- GRID RECURSOS -->
+<div class="lra-rec-grid"><!-- HARDWARE Y COMPONENTES -->
+<div class="lra-rec-card">
+<div class="lra-rec-header" style="background: #fdf0ee;">
+<div class="lra-rec-ico" style="background: rgba(192,57,43,0.12);">🔌</div>
+<div>
+<div class="lra-rec-htitle">Hardware y componentes</div>
+<div class="lra-rec-hsub">Datasheets, drivers y documentación del sensor</div>
+</div>
+</div>
+<div class="lra-rec-links"><a class="lra-rlink" href="https://www.bosch-sensortec.com/products/environmental-sensors/pressure-sensors/bmp280/" target="_blank" rel="noopener noreferrer"> <span class="lra-rlink-bullet" style="background: #c0392b;"></span> <span class="lra-rlink-body"> <span class="lra-rlink-title">BMP280 — Datasheet oficial (Bosch)</span> <span class="lra-rlink-desc">Hoja técnica completa del sensor barométrico del proyecto</span> </span> <i class="lra-rlink-arrow">↗</i> </a> <a class="lra-rlink" href="https://sparks.gogo.co.nz/ch340.html" target="_blank" rel="noopener noreferrer"> <span class="lra-rlink-bullet" style="background: #c0392b;"></span> <span class="lra-rlink-body"> <span class="lra-rlink-title">Driver CH340 — Descarga</span> <span class="lra-rlink-desc">Necesario si el PC no reconoce el puerto COM del ESP8266</span> </span> <i class="lra-rlink-arrow">↗</i> </a> <a class="lra-rlink" href="https://www.wemos.cc/en/latest/d1/d1_mini.html" target="_blank" rel="noopener noreferrer"> <span class="lra-rlink-bullet" style="background: #c0392b;"></span> <span class="lra-rlink-body"> <span class="lra-rlink-title">Wemos D1 Mini — Documentación</span> <span class="lra-rlink-desc">Pinout, especificaciones y esquemas de la placa ESP8266</span> </span> <i class="lra-rlink-arrow">↗</i> </a></div>
+</div>
+<!-- ARDUINO IDE -->
+<div class="lra-rec-card">
+<div class="lra-rec-header" style="background: #eaf4fd;">
+<div class="lra-rec-ico" style="background: rgba(46,134,193,0.12);">💻</div>
+<div>
+<div class="lra-rec-htitle">Arduino IDE y librerías</div>
+<div class="lra-rec-hsub">Entorno de programación y dependencias del proyecto</div>
+</div>
+</div>
+<div class="lra-rec-links"><a class="lra-rlink" href="https://www.arduino.cc/en/software" target="_blank" rel="noopener noreferrer"> <span class="lra-rlink-bullet" style="background: #2e86c1;"></span> <span class="lra-rlink-body"> <span class="lra-rlink-title">Arduino IDE — Descarga oficial</span> <span class="lra-rlink-desc">Entorno de programación para el ESP8266 (v2.x recomendada)</span> </span> <i class="lra-rlink-arrow">↗</i> </a> <a class="lra-rlink" href="https://github.com/adafruit/Adafruit_BMP280_Library" target="_blank" rel="noopener noreferrer"> <span class="lra-rlink-bullet" style="background: #2e86c1;"></span> <span class="lra-rlink-body"> <span class="lra-rlink-title">Adafruit BMP280 Library</span> <span class="lra-rlink-desc">Librería para leer temperatura, presión y altitud del BMP280</span> </span> <i class="lra-rlink-arrow">↗</i> </a> <a class="lra-rlink" href="https://pubsubclient.knolleary.net/" target="_blank" rel="noopener noreferrer"> <span class="lra-rlink-bullet" style="background: #2e86c1;"></span> <span class="lra-rlink-body"> <span class="lra-rlink-title">PubSubClient (MQTT)</span> <span class="lra-rlink-desc">Cliente MQTT para Arduino y ESP8266 de Nick O'Leary</span> </span> <i class="lra-rlink-arrow">↗</i> </a> <a class="lra-rlink" href="https://arduinojson.org/" target="_blank" rel="noopener noreferrer"> <span class="lra-rlink-bullet" style="background: #2e86c1;"></span> <span class="lra-rlink-body"> <span class="lra-rlink-title">ArduinoJson</span> <span class="lra-rlink-desc">Librería para crear y parsear JSON en microcontroladores</span> </span> <i class="lra-rlink-arrow">↗</i> </a></div>
+</div>
+<!-- MQTT Y NODE-RED -->
+<div class="lra-rec-card">
+<div class="lra-rec-header" style="background: #e6f8f9;">
+<div class="lra-rec-ico" style="background: rgba(0,156,166,0.12);">📡</div>
+<div>
+<div class="lra-rec-htitle">MQTT y Node-RED</div>
+<div class="lra-rec-hsub">Protocolo IoT y herramienta de visualización</div>
+</div>
+</div>
+<div class="lra-rec-links"><a class="lra-rlink" href="https://nodered.org/docs/" target="_blank" rel="noopener noreferrer"> <span class="lra-rlink-bullet" style="background: #c0392b;"></span> <span class="lra-rlink-body"> <span class="lra-rlink-title">Node-RED — Documentación oficial</span> <span class="lra-rlink-desc">Guías, tutoriales y referencia completa de todos los nodos</span> </span> <i class="lra-rlink-arrow">↗</i> </a> <a class="lra-rlink" href="https://flows.nodered.org/node/node-red-dashboard" target="_blank" rel="noopener noreferrer"> <span class="lra-rlink-bullet" style="background: #c0392b;"></span> <span class="lra-rlink-body"> <span class="lra-rlink-title">Node-RED Dashboard</span> <span class="lra-rlink-desc">Módulo de visualización con gauges, textos, switches e interruptores</span> </span> <i class="lra-rlink-arrow">↗</i> </a> <a class="lra-rlink" href="https://mqtt.org/" target="_blank" rel="noopener noreferrer"> <span class="lra-rlink-bullet" style="background: #009ca6;"></span> <span class="lra-rlink-body"> <span class="lra-rlink-title">MQTT.org — Especificación del protocolo</span> <span class="lra-rlink-desc">Documentación oficial del protocolo de mensajería IoT</span> </span> <i class="lra-rlink-arrow">↗</i> </a> <a class="lra-rlink" href="https://mosquitto.org/" target="_blank" rel="noopener noreferrer"> <span class="lra-rlink-bullet" style="background: #009ca6;"></span> <span class="lra-rlink-body"> <span class="lra-rlink-title">Eclipse Mosquitto — Broker MQTT</span> <span class="lra-rlink-desc">Broker open source utilizado en este proyecto para recibir mensajes</span> </span> <i class="lra-rlink-arrow">↗</i> </a></div>
+</div>
+<!-- RECURSOS DIDÁCTICOS -->
+<div class="lra-rec-card">
+<div class="lra-rec-header" style="background: #edf7f1;">
+<div class="lra-rec-ico" style="background: rgba(26,122,74,0.12);">📚</div>
+<div>
+<div class="lra-rec-htitle">Recursos didácticos y eXeLearning</div>
+<div class="lra-rec-hsub">Herramientas para la creación de REA</div>
+</div>
+</div>
+<div class="lra-rec-links"><a class="lra-rlink" href="https://exelearning.net/es/" target="_blank" rel="noopener noreferrer"> <span class="lra-rlink-bullet" style="background: #1a7a4a;"></span> <span class="lra-rlink-body"> <span class="lra-rlink-title">eXeLearning 2.9 — Descarga</span> <span class="lra-rlink-desc">Herramienta utilizada para crear este REA (versión 2.9)</span> </span> <i class="lra-rlink-arrow">↗</i> </a> <a class="lra-rlink" href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener noreferrer"> <span class="lra-rlink-bullet" style="background: #6d1a8a;"></span> <span class="lra-rlink-body"> <span class="lra-rlink-title">Creative Commons BY 4.0 — Texto legal</span> <span class="lra-rlink-desc">Licencia completa bajo la que se distribuye este recurso</span> </span> <i class="lra-rlink-arrow">↗</i> </a> <a class="lra-rlink" href="https://www.edu.xunta.gal/espazoAbalar/espazo/repositorio/cont/rea" target="_blank" rel="noopener noreferrer"> <span class="lra-rlink-bullet" style="background: #1a7a4a;"></span> <span class="lra-rlink-body"> <span class="lra-rlink-title">Repositorio REA — Espazo Abalar</span> <span class="lra-rlink-desc">Referencia de repositorios institucionales de recursos educativos</span> </span> <i class="lra-rlink-arrow">↗</i> </a></div>
+</div>
+</div>
+<!-- NOTA FINAL -->
+<div class="lra-note"><strong>Nota para el alumnado:</strong> todos los enlaces externos se abren en una pestaña nueva. Para acceder al código fuente completo del proyecto, las instrucciones de montaje paso a paso y los flujos de Node-RED listos para importar, consulta el repositorio de GitHub indicado arriba.</div>
+</div>
+</div></div>
+</div>
+</div>
+</article>
+<div id="packageLicense" class="cc cc-by-sa">
+<p><span>Obra publicada con</span> <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Licencia Creative Commons Reconocimiento Compartir igual 4.0</a></p>
+</div>
+</section>
+</div>
+<div id='bottomPagination'>
+<nav class="pagination noprt">
+<a href="actividades_interactivas.html" class="prev"><span><span>&laquo; </span>Anterior</span></a>
+</nav>
+</div>
+<footer id="siteFooter">Daniel Rodríguez Carrión | REA para Tecnología e Ingeniería | Curso 2025-2026 | Licencia CC </footer></div>
+<p id="made-with-eXe"><a href="https://exelearning.net/" target="_blank" rel="noopener"><span>Creado con eXeLearning<span> (Ventana nueva)</span></span></a></p><script type="text/javascript" src="_intef_js.js"></script></body></html>

@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="es">
+<head>
+<link rel="stylesheet" type="text/css" href="base.css" />
+<link rel="stylesheet" type="text/css" href="exe_lightbox.css" />
+<link rel="stylesheet" type="text/css" href="content.css" />
+<link rel="stylesheet" type="text/css" href="nav.css" />
+<meta http-equiv="content-type" content="text/html;  charset=utf-8" />
+<title>Fase 5. Node-RED y dashboard | Estación meteorológica IoT con ESP8266, BMP280 y MQTT </title>
+<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+<meta name="author" content="Daniel Rodríguez Carrión" />
+<link rel="license" type="text/html" href="http://creativecommons.org/licenses/by-sa/4.0/" />
+<meta name="generator" content="eXeLearning 2.9 - exelearning.net" />
+<!--[if lt IE 9]><script type="text/javascript" src="exe_html5.js"></script><![endif]-->
+<script type="text/javascript" src="exe_jquery.js"></script>
+<script type="text/javascript" src="exe_lightbox.js"></script>
+<script type="text/javascript" src="common_i18n.js"></script>
+<script type="text/javascript" src="common.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* ESTILOS PARA COPIAR EN EL EDITOR DE EXELEARNING */
+        .container-header-iot {
+            --color-unam-azul: #0a2558;
+            --color-unam-cian: #009ca6;
+            --bg-gradient: linear-gradient(135deg, var(--color-unam-azul) 0%, #1a3a7a 50%, var(--color-unam-cian) 100%);
+            
+            width: 100%;
+            margin: 0 auto 25px auto;
+            background: var(--bg-gradient);
+            border-radius: 15px;
+            overflow: hidden;
+            color: white;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            box-shadow: 0 10px 30px rgba(0, 156, 166, 0.25);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-top {
+            display: flex;
+            padding: 30px 40px;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-info {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .header-info .subject {
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #b3e6ec;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .header-info h1 {
+            margin: 0;
+            font-size: 2.4rem;
+            font-weight: 800;
+            line-height: 1.1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header-info p.tagline {
+            margin: 10px 0 0 0;
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 300;
+        }
+
+        .header-logo-box {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+
+        .header-logo-box:hover {
+            transform: scale(1.03);
+        }
+
+        .header-logo-box img {
+            height: 65px;
+            width: auto;
+            display: block;
+        }
+
+        .header-bottom {
+            background: rgba(0, 0, 0, 0.15);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .tech-stack {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Recuperación de los tags con efectos de hover */
+        .tech-pill {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(4px);
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .tech-pill:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
+        .project-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #e0faff;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Efecto de red de fondo decorativo */
+        .header-pattern {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .header-top { padding: 20px; }
+            .header-bottom { padding: 15px 20px; }
+            .header-info h1 { font-size: 1.8rem; }
+            .header-logo-box img { height: 50px; }
+            .project-meta { width: 100%; justify-content: space-between; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- BLOQUE HTML PARA PEGAR EN EL iDEVICE DE EXELARNING -->
+    <div class="container-header-iot" style="position: relative;">
+        <div class="header-pattern"></div>
+        
+        <div class="header-top">
+            <div class="header-info">
+                <span class="subject">Tecnología e Ingeniería I • Bachillerato</span>
+                <h1>Estación Meteorológica IoT</h1>
+                <p class="tagline">Diseño, Programación y Ética en la Cultura Maker</p>
+                
+                <div class="tech-stack" style="margin-top: 22px;">
+                    <span class="tech-pill">ESP8266</span>
+                    <span class="tech-pill">BMP280</span>
+                    <span class="tech-pill">MQTT / JSON</span>
+                    <span class="tech-pill">Node-RED</span>
+                </div>
+            </div>
+            
+            <div class="header-logo-box">
+                <!-- Enlace actualizado con el logo de la Universidad del Atlántico Medio -->
+                <img src="https://www.universidadatlanticomedio.es/img/logo/UNAM_logo.png" alt="Logotipo Universidad del Atlántico Medio">
+            </div>
+        </div>
+
+        <div class="header-bottom">
+            <div class="project-meta">
+                <div class="meta-item">
+                    <span>📡 <b>Fase:</b> Prototipado y Comunicaciones</span>
+                </div>
+                <div class="meta-item">
+                    <span>💡 <b>Metodología:</b> ABP</span>
+                </div>
+            </div>
+            <div style="font-size: 0.75rem; opacity: 0.7; letter-spacing: 0.5px;">
+                RECURSO EDUCATIVO ABIERTO (REA)
+            </div>
+        </div>
+    </div>
+    <!-- FIN DEL BLOQUE HTML -->
+
+</body>
+</html></head>
+<body class="exe-web-site" id="exe-node-13"><script type="text/javascript">document.body.className+=" js"</script>
+<div id="content">
+<p id="skipNav"><a href="#main" class="sr-av">Saltar la navegación</a></p>
+<header id="header" ><div id="headerContent">Estación meteorológica IoT con ESP8266, BMP280 y MQTT</div></header>
+<nav id="siteNav">
+<ul>
+   <li><a href="index.html" class="daddy main-node">Inicio</a></li>
+   <li><a href="gua_didctica.html" class="no-ch">Guía didáctica</a></li>
+   <li class="current-page-parent"><a href="introduccin_al_proyecto.html" class="current-page-parent daddy">Introducción al proyecto</a>
+   <ul>
+      <li><a href="fase_1_electrnica_y_soldadura.html" class="no-ch">Fase 1. Electrónica y soldadura</a></li>
+      <li><a href="fase_2_lectura_local_del_sensor.html" class="no-ch">Fase 2. Lectura local del sensor</a></li>
+      <li><a href="fase_3_iot_wifi_mqtt_y_json.html" class="no-ch">Fase 3. IoT, WiFi, MQTT y JSON</a></li>
+      <li><a href="fase_4_envo_de_datos_va_mqtt.html" class="no-ch">Fase 4. Envío de datos vía MQTT</a></li>
+      <li id="active"><a href="fase_5_nodered_y_dashboard.html" class="active no-ch">Fase 5. Node-RED y dashboard</a></li>
+      <li><a href="fase_6_anlisis_reflexin_y_entrega.html" class="no-ch">Fase 6. Análisis, reflexión y entrega</a></li>
+   </ul>
+   </li>
+   <li><a href="actividades_interactivas.html" class="no-ch">Actividades interactivas</a></li>
+   <li><a href="licencia_autora_y_recursos.html" class="no-ch">Licencia, autoría y recursos</a></li>
+</ul>
+</nav>
+<div id='topPagination'>
+<nav class="pagination noprt">
+<a href="fase_4_envo_de_datos_va_mqtt.html" class="prev"><span><span>&laquo; </span>Anterior</span></a> <span class="sep">| </span><a href="fase_6_anlisis_reflexin_y_entrega.html" class="next"><span>Siguiente<span> &raquo;</span></span></a>
+</nav>
+</div>
+<div id="main-wrapper">
+<section id="main">
+<header id="nodeDecoration"><h1 id="nodeTitle">Fase 5. Node-RED y dashboard</h1></header>
+<article class="iDevice_wrapper textIdevice" id="id14">
+<div class="iDevice emphasis0" >
+<div id="ta14_140_2" class="block iDevice_content">
+<div class="exe-text"><p></p>
+<style>
+  :root {
+    --f5-azul:    #0a2558;
+    --f5-azul2:   #143a7b;
+    --f5-rojo:    #c0392b;
+    --f5-rojo2:   #a93226;
+    --f5-rojo-soft: #fdf0ee;
+    --f5-cian:    #009ca6;
+    --f5-cian-soft: #e6f8f9;
+    --f5-naranja: #d97a00;
+    --f5-bg:      #f4f8fc;
+    --f5-white:   #ffffff;
+    --f5-text:    #18314f;
+    --f5-muted:   #5d7690;
+    --f5-border:  rgba(10,37,88,0.10);
+    --f5-shadow:  0 12px 28px rgba(10,37,88,0.08);
+    --f5-code-bg: #0d1b2e;
+  }
+  .fase5-iot { font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif; color:var(--f5-text); margin:0 0 30px 0; }
+  .fase5-iot * { box-sizing:border-box; }
+
+  /* SHELL */
+  .f5-shell { background:linear-gradient(180deg,#f8fbfe 0%,#eef5fb 100%); border:1px solid rgba(10,37,88,0.06); border-radius:22px; padding:26px; box-shadow:var(--f5-shadow); }
+
+  /* HERO */
+  .f5-hero { background:linear-gradient(135deg,#c0392b 0%,#922b21 45%,#0a2558 100%); color:#fff; border-radius:22px; padding:28px; margin-bottom:22px; position:relative; overflow:hidden; box-shadow:0 16px 34px rgba(192,57,43,0.18); }
+  .f5-hero:before { content:""; position:absolute; inset:0; background-image:radial-gradient(rgba(255,255,255,0.10) 1px,transparent 1px); background-size:18px 18px; opacity:0.5; pointer-events:none; }
+  .f5-hero > * { position:relative; z-index:1; }
+  .f5-kicker { display:inline-block; padding:8px 14px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.22); border-radius:999px; font-size:0.78rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; margin-bottom:16px; }
+  .f5-hero h2 { margin:0 0 12px 0; font-size:1.95rem; line-height:1.08; font-weight:800; }
+  .f5-hero p { margin:0 0 14px 0; font-size:1rem; line-height:1.7; color:rgba(255,255,255,0.93); }
+  .f5-pill-row { display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
+  .f5-pill { display:inline-flex; align-items:center; padding:8px 14px; border-radius:999px; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.24); color:#fff; font-size:0.82rem; font-weight:700; cursor:help; transition:transform 0.22s,box-shadow 0.22s,background 0.22s; }
+  .f5-pill:hover { transform:translateY(-3px); background:rgba(255,255,255,0.28); box-shadow:0 8px 18px rgba(0,0,0,0.14); }
+
+  /* NOTE */
+  .f5-note { background:linear-gradient(90deg,var(--f5-cian-soft),#f0fbff); border-left:4px solid var(--f5-cian); border-radius:0 14px 14px 0; padding:14px 16px; font-size:0.93rem; color:var(--f5-text); line-height:1.6; margin-bottom:22px; }
+  .f5-note strong { color:var(--f5-azul); }
+
+  .f5-warn { background:linear-gradient(90deg,#fff8f0,#fffcf7); border-left:4px solid var(--f5-naranja); border-radius:0 14px 14px 0; padding:14px 16px; font-size:0.93rem; color:var(--f5-text); line-height:1.6; margin-bottom:22px; }
+  .f5-warn strong { color:#a04800; }
+
+  /* SECTION TITLE */
+  .f5-section-title { display:flex; align-items:center; gap:10px; font-size:1.06rem; font-weight:800; color:var(--f5-azul); margin:0 0 16px 0; padding-bottom:10px; border-bottom:2px solid rgba(10,37,88,0.08); }
+  .f5-section-title .f5-badge { background:var(--f5-rojo); color:#fff; border-radius:999px; padding:4px 12px; font-size:0.78rem; font-weight:800; letter-spacing:0.3px; }
+
+  /* GRID 2 COL */
+  .f5-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-bottom:22px; }
+
+  /* CARD */
+  .f5-card { background:var(--f5-white); border:1px solid var(--f5-border); border-radius:18px; padding:20px; box-shadow:var(--f5-shadow); }
+  .f5-card h3 { margin:0 0 12px 0; color:var(--f5-azul); font-size:1.02rem; font-weight:800; display:flex; align-items:center; gap:8px; }
+  .f5-card h3 .f5-icon { width:30px; height:30px; background:var(--f5-rojo-soft); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1rem; }
+  .f5-card p { margin:0 0 10px 0; font-size:0.93rem; line-height:1.65; color:var(--f5-muted); }
+
+  /* NODO CARDS */
+  .f5-nodes-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:22px; }
+  .f5-node-card { background:#fff; border:1px solid var(--f5-border); border-radius:16px; overflow:hidden; box-shadow:var(--f5-shadow); transition:transform 0.22s,box-shadow 0.22s; }
+  .f5-node-card:hover { transform:translateY(-4px); box-shadow:0 18px 36px rgba(10,37,88,0.12); }
+  .f5-node-header { padding:12px 14px 10px; display:flex; align-items:center; gap:10px; }
+  .f5-node-icon-wrap { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; }
+  .f5-node-icon-wrap img { width:100%; height:100%; object-fit:contain; border-radius:8px; }
+  .f5-node-name { font-size:0.95rem; font-weight:800; color:var(--f5-azul); }
+  .f5-node-type { font-size:0.78rem; color:var(--f5-muted); font-weight:500; }
+  .f5-node-img { width:100%; display:block; border-top:1px solid var(--f5-border); }
+  .f5-node-body { padding:10px 14px 14px; }
+  .f5-node-desc { font-size:0.88rem; color:var(--f5-muted); line-height:1.55; margin:0; }
+
+  /* STEPS */
+  .f5-steps { display:grid; gap:12px; margin-bottom:22px; }
+  .f5-step { display:flex; gap:14px; align-items:flex-start; background:linear-gradient(180deg,#fbfdff,#f4fbfc); border:1px solid rgba(0,156,166,0.14); border-radius:16px; padding:14px; transition:transform 0.22s,box-shadow 0.22s; }
+  .f5-step:hover { transform:translateX(4px); box-shadow:0 10px 20px rgba(10,37,88,0.07); }
+  .f5-step-num { width:32px; height:32px; min-width:32px; border-radius:50%; background:var(--f5-rojo); color:#fff; display:flex; align-items:center; justify-content:center; font-size:0.85rem; font-weight:800; }
+  .f5-step-body { flex:1; }
+  .f5-step-title { font-weight:700; font-size:0.96rem; color:var(--f5-azul); margin-bottom:4px; }
+  .f5-step-desc { font-size:0.9rem; color:var(--f5-muted); line-height:1.55; }
+
+  /* SCREENSHOT GALLERY */
+  .f5-gallery { display:grid; grid-template-columns:repeat(2,1fr); gap:18px; margin-bottom:22px; }
+  .f5-screenshot { background:#fff; border:1px solid var(--f5-border); border-radius:16px; overflow:hidden; box-shadow:var(--f5-shadow); transition:transform 0.22s,box-shadow 0.22s; }
+  .f5-screenshot:hover { transform:translateY(-3px); box-shadow:0 16px 32px rgba(10,37,88,0.12); }
+  .f5-screenshot a { display:block; }
+  .f5-screenshot img { width:100%; display:block; border-bottom:1px solid var(--f5-border); }
+  .f5-screenshot-caption { padding:10px 14px; }
+  .f5-screenshot-caption strong { display:block; font-size:0.91rem; color:var(--f5-azul); font-weight:700; margin-bottom:3px; }
+  .f5-screenshot-caption span { font-size:0.83rem; color:var(--f5-muted); line-height:1.45; }
+
+  /* RUTA JSON */
+  .f5-json-route { background:var(--f5-code-bg); border-radius:14px; padding:16px 18px; margin-bottom:10px; }
+  .f5-json-route pre { margin:0; font-family:'Consolas','Courier New',monospace; font-size:0.88rem; line-height:1.75; color:#e2f0ff; white-space:pre-wrap; }
+  .f5-route-comment { color:#5f9ea0; font-style:italic; }
+  .f5-route-key { color:#c3e88d; }
+  .f5-route-path { color:#82aaff; }
+
+  /* GITHUB LINK */
+  .f5-github-link { display:flex; align-items:center; gap:14px; background:linear-gradient(135deg,#0d1b2e,#1a2e48); border-radius:16px; padding:16px 20px; margin-bottom:22px; text-decoration:none; transition:transform 0.22s,box-shadow 0.22s; }
+  .f5-github-link:hover { transform:translateY(-2px); box-shadow:0 16px 32px rgba(10,37,88,0.22); }
+  .f5-github-link svg { flex-shrink:0; }
+  .f5-github-text strong { display:block; color:#fff; font-size:0.96rem; font-weight:800; margin-bottom:3px; }
+  .f5-github-text span { color:rgba(255,255,255,0.65); font-size:0.85rem; }
+  .f5-github-arrow { margin-left:auto; color:rgba(255,255,255,0.5); font-size:1.3rem; }
+
+  /* TOOLTIP */
+  .f5-tt { position:relative; display:inline-flex; align-items:center; cursor:help; }
+  .f5-tt strong { color:var(--f5-azul); border-bottom:1px dashed rgba(0,156,166,0.55); transition:color 0.22s,border-color 0.22s; }
+  .f5-tt:hover strong { color:var(--f5-cian); border-color:rgba(0,156,166,0.9); }
+  .f5-tt-box { position:absolute; left:50%; bottom:calc(100% + 10px); transform:translateX(-50%) translateY(6px); min-width:220px; max-width:280px; padding:10px 12px; border-radius:12px; background:linear-gradient(180deg,#0d285d,#143a7b); color:#fff; font-size:0.82rem; line-height:1.45; font-weight:400; box-shadow:0 10px 24px rgba(10,37,88,0.22); opacity:0; visibility:hidden; pointer-events:none; z-index:100; transition:opacity 0.22s,transform 0.22s,visibility 0.22s; }
+  .f5-tt-box:after { content:""; position:absolute; top:100%; left:50%; transform:translateX(-50%); border-width:7px; border-style:solid; border-color:#143a7b transparent transparent transparent; }
+  .f5-tt:hover .f5-tt-box { opacity:1; visibility:visible; transform:translateX(-50%) translateY(0); }
+
+  /* DASHBOARD PREVIEW */
+  .f5-dashboard-preview { border-radius:18px; overflow:hidden; box-shadow:0 20px 48px rgba(10,37,88,0.16); margin-bottom:22px; position:relative; }
+  .f5-dashboard-preview img { width:100%; display:block; }
+  .f5-dashboard-badge { position:absolute; top:12px; left:12px; background:rgba(10,37,88,0.85); color:#fff; padding:6px 12px; border-radius:999px; font-size:0.78rem; font-weight:700; backdrop-filter:blur(6px); }
+
+  @media (max-width:900px) {
+    .f5-grid2,.f5-gallery { grid-template-columns:1fr; }
+    .f5-nodes-grid { grid-template-columns:1fr 1fr; }
+  }
+  @media (max-width:580px) {
+    .f5-nodes-grid { grid-template-columns:1fr; }
+  }
+</style>
+<div class="fase5-iot">
+<div class="f5-shell"><!-- HERO -->
+<div class="f5-hero"><span class="f5-kicker">📊 Fase 5 · 3–4 sesiones</span>
+<h2>Node-RED y Dashboard de visualización</h2>
+<p>El ESP8266 ya envía datos por MQTT. Ahora toca recibirlos, transformarlos y visualizarlos en tiempo real. Node-RED actúa como el cerebro que conecta el broker con el panel de control: recibe el mensaje, lo interpreta como JSON y lo presenta en gauges, textos y gráficas.</p>
+<div class="f5-pill-row"><span class="f5-pill">mqtt-in</span> <span class="f5-pill">JSON</span> <span class="f5-pill">function</span> <span class="f5-pill">switch</span> <span class="f5-pill">ui_gauge</span> <span class="f5-pill">ui_text</span> <span class="f5-pill">Deploy</span> <span class="f5-pill">Dashboard</span></div>
+</div>
+<!-- NOTA CONEXIÓN -->
+<div class="f5-note">El ESP8266 publica datos en el tópico <code><strong>cabrerapinto/meteorologia/esp8266-id/bmp280</strong></code>. En esta fase, Node-RED se suscribe a ese mismo tópico, recibe el payload JSON y lo convierte en una visualización útil e interactiva.</div>
+<!-- QUÉ ES NODE-RED -->
+<div class="f5-section-title"><span>🔴</span> ¿Qué es Node-RED? <span class="f5-badge">Conceptual</span></div>
+<div class="f5-grid2">
+<div class="f5-card">
+<h3><span class="f5-icon">🧩</span>Programación por flujos</h3>
+<p><span class="f5-tt"><strong>Node-RED</strong><span class="f5-tt-box">Entorno de programación visual desarrollado por IBM, basado en Node.js. Permite conectar dispositivos, APIs y servicios mediante nodos que se unen con cables en un editor web.</span></span> es una herramienta de programación visual que funciona en un navegador web. En lugar de escribir código línea a línea, se construyen <span class="f5-tt"><strong>flujos</strong><span class="f5-tt-box">Secuencia de nodos conectados entre sí mediante cables. Cada nodo recibe un mensaje, lo procesa de alguna forma y lo pasa al siguiente.</span></span>: cadenas de nodos que reciben, transforman y visualizan datos.</p>
+<p><a href="que_es_nodered.png" rel="lightbox"><img src="que_es_nodered.png" alt="Qué es NodeRed" width="1408" height="768" /></a></p>
+<p>La metáfora es la de una cadena de montaje: cada nodo hace una tarea concreta y pasa el resultado al siguiente. Así, el dato viaja desde el broker MQTT hasta el panel de control pasando por varios nodos de procesamiento.</p>
+</div>
+<div class="f5-card">
+<h3><span class="f5-icon">🖥️</span>La interfaz de trabajo</h3>
+<p>El editor de Node-RED tiene tres zonas principales: la <strong>paleta de nodos</strong> a la izquierda, el <strong>espacio de trabajo</strong> en el centro donde se construyen los flujos, y el <strong>panel lateral</strong> a la derecha con el debug, el dashboard y la información de los nodos.</p>
+<p><a href="espacios_trabajo_nodered.png" rel="lightbox"><img src="espacios_trabajo_nodered.png" alt="Espacios de trabajo en NodeRed" width="1916" height="877" /></a></p>
+<p>El botón <span class="f5-tt"><strong>Deploy</strong><span class="f5-tt-box">Botón rojo en la esquina superior derecha del editor. Al pulsarlo se activan todos los cambios realizados en el flujo. Sin deploy, las modificaciones no tienen efecto.</span></span> es fundamental: activa el flujo para que empiece a procesar mensajes reales.<span></span></p>
+</div>
+</div>
+<!-- NODOS CLAVE -->
+<div class="f5-section-title"><span>🔧</span> Nodos clave del proyecto <span class="f5-badge">Guía práctica</span></div>
+<div class="f5-nodes-grid">
+<div class="f5-node-card">
+<div class="f5-node-header">
+<div class="f5-node-icon-wrap" style="background: #8B0000;"><img src="https://raw.githubusercontent.com/DaniCampusIoT/ESP8266-BMP280-MQTT-JSON-Proyecto-1-Bachillerato/main/img/mqttin.png" alt="Nodo mqtt-in" /></div>
+<div>
+<div class="f5-node-name">mqtt-in</div>
+<div class="f5-node-type">Entrada · Recepción de datos</div>
+</div>
+</div>
+<a href="https://raw.githubusercontent.com/DaniCampusIoT/ESP8266-BMP280-MQTT-JSON-Proyecto-1-Bachillerato/main/img/mqttin_config.png" rel="lightbox" title="Configuración del nodo mqtt-in"> <img class="f5-node-img" src="https://raw.githubusercontent.com/DaniCampusIoT/ESP8266-BMP280-MQTT-JSON-Proyecto-1-Bachillerato/main/img/mqttin_config.png" alt="Configuración del nodo mqtt-in" loading="lazy" /> </a>
+<div class="f5-node-body">
+<p class="f5-node-desc">Se suscribe al tópico del broker y recibe el payload JSON en <code>msg.payload</code>. Se configura con la IP del broker, el puerto 1883 y el tópico exacto del proyecto.</p>
+</div>
+</div>
+<div class="f5-node-card">
+<div class="f5-node-header">
+<div class="f5-node-icon-wrap" style="background: #444;"><img src="https://raw.githubusercontent.com/DaniCampusIoT/ESP8266-BMP280-MQTT-JSON-Proyecto-1-Bachillerato/main/img/json.png" alt="Nodo JSON" /></div>
+<div>
+<div class="f5-node-name">json</div>
+<div class="f5-node-type">Transformación · Parseo</div>
+</div>
+</div>
+<a href="https://raw.githubusercontent.com/DaniCampusIoT/ESP8266-BMP280-MQTT-JSON-Proyecto-1-Bachillerato/main/img/json_format_flow.png" rel="lightbox" title="Flujo con nodo JSON"> <img class="f5-node-img" src="https://raw.githubusercontent.com/DaniCampusIoT/ESP8266-BMP280-MQTT-JSON-Proyecto-1-Bachillerato/main/img/json_format_flow.png" alt="Flujo con nodo JSON" loading="lazy" /> </a>
+<div class="f5-node-body">
+<p class="f5-node-desc">Convierte el texto del payload en un objeto JavaScript para poder acceder a sus propiedades mediante rutas como <code>msg.payload.sensor.temperatura_c</code>.</p>
+</div>
+</div>
+<div class="f5-node-card">
+<div class="f5-node-header">
+<div class="f5-node-icon-wrap" style="background: #c05c2c;"><img src="https://raw.githubusercontent.com/DaniCampusIoT/ESP8266-BMP280-MQTT-JSON-Proyecto-1-Bachillerato/main/img/function.png" alt="Nodo function" /></div>
+<div>
+<div class="f5-node-name">function</div>
+<div class="f5-node-type">Lógica · JavaScript</div>
+</div>
+</div>
+<a href="https://raw.githubusercontent.com/DaniCampusIoT/ESP8266-BMP280-MQTT-JSON-Proyecto-1-Bachillerato/main/img/function_config.png" rel="lightbox" title="Configuración del nodo function"> <img class="f5-node-img" src="https://raw.githubusercontent.com/DaniCampusIoT/ESP8266-BMP280-MQTT-JSON-Proyecto-1-Bachillerato/main/img/function_config.png" alt="Configuración del nodo function" loading="lazy" /> </a>
+<div class="f5-node-body">
+<p class="f5-node-desc">Extrae una variable concreta del JSON y la asigna a <code>msg.payload</code> para que el siguiente nodo la reciba lista para visualizar. Ideal para separar temperatura, presión y altitud en ramas distintas.</p>
+</div>
+</div>
+<div class="f5-node-card">
+<div class="f5-node-header">
+<div class="f5-node-icon-wrap" style="background: #2b6cb0;"><img src="https://raw.githubusercontent.com/DaniCampusIoT/ESP8266-BMP280-MQTT-JSON-Proyecto-1-Bachillerato/main/img/switch.png" alt="Nodo switch" /></div>
+<div>
+<div class="f5-node-name">switch</div>
+<div class="f5-node-type">Lógica · Enrutamiento</div>
+</div>
+</div>
+<a href="https://raw.githubusercontent.com/DaniCampusIoT/ESP8266-BMP280-MQTT-JSON-Proyecto-1-Bachillerato/main/img/switch_config.png" rel="lightbox" title="Configuración del nodo switch"> <img class="f5-node-img" src="https://raw.githubusercontent.com/DaniCampusIoT/ESP8266-BMP280-MQTT-JSON-Proyecto-1-Bachillerato/main/img/switch_config.png" alt="Configuración del nodo switch" loading="lazy" /> </a>
+<div class="f5-node-body">
+<p class="f5-node-desc">Evalúa condiciones sobre el valor recibido y dirige el mensaje a una salida u otra. Útil para generar alertas cuando la temperatura supera un umbral determinado.</p>
+</div>
+</div>
+<div class="f5-node-card">
+<div class="f5-node-header">
+<div class="f5-node-icon-wrap" style="background: #1a6e5a;"><img src="https://raw.githubusercontent.com/DaniCampusIoT/ESP8266-BMP280-MQTT-JSON-Proyecto-1-Bachillerato/main/img/gauge.png" alt="Nodo ui_gauge" /></div>
+<div>
+<div class="f5-node-name">ui_gauge</div>
+<div class="f5-node-type">Dashboard · Medidor</div>
+</div>
+</div>
+<a href="https://raw.githubusercontent.com/DaniCampusIoT/ESP8266-BMP280-MQTT-JSON-Proyecto-1-Bachillerato/main/img/ui_gauge_config.png" rel="lightbox" title="Configuración del nodo ui_gauge"> <img class="f5-node-img" src="https://raw.githubusercontent.com/DaniCampusIoT/ESP8266-BMP280-MQTT-JSON-Proyecto-1-Bachillerato/main/img/ui_gauge_config.png" alt="Configuración del nodo ui_gauge" loading="lazy" /> </a>
+<div class="f5-node-body">
+<p class="f5-node-desc">Muestra el valor recibido en un velocímetro visual en el dashboard. Se configura con el rango mínimo y máximo, la unidad y el grupo al que pertenece dentro del panel.</p>
+</div>
+</div>
+<div class="f5-node-card">
+<div class="f5-node-header">
+<div class="f5-node-icon-wrap" style="background: #1a6e5a;"><img src="https://raw.githubusercontent.com/DaniCampusIoT/ESP8266-BMP280-MQTT-JSON-Proyecto-1-Bachillerato/main/img/text.png" alt="Nodo ui_text" /></div>
+<div>
+<div class="f5-node-name">ui_text</div>
+<div class="f5-node-type">Dashboard · Texto</div>
+</div>
+</div>
+<a href="https://raw.githubusercontent.com/DaniCampusIoT/ESP8266-BMP280-MQTT-JSON-Proyecto-1-Bachillerato/main/img/flow_con_texto.png" rel="lightbox" title="Flujo con nodo ui_text"> <img class="f5-node-img" src="https://raw.githubusercontent.com/DaniCampusIoT/ESP8266-BMP280-MQTT-JSON-Proyecto-1-Bachillerato/main/img/flow_con_texto.png" alt="Flujo con nodo ui_text" loading="lazy" /> </a>
+<div class="f5-node-body">
+<p class="f5-node-desc">Muestra el valor como texto etiquetado en el dashboard. Resulta especialmente útil para presión y altitud, donde un número con unidades es suficiente para la lectura.</p>
+</div>
+</div>
+</div>
+<!-- SECUENCIA CONSTRUCCIÓN -->
+<div class="f5-section-title"><span>🏗️</span> Cómo construir el flujo paso a paso <span class="f5-badge">Procedimiento</span></div>
+<div class="f5-steps">
+<div class="f5-step">
+<div class="f5-step-num">1</div>
+<div class="f5-step-body">
+<div class="f5-step-title">Crear pestaña y grupo en el dashboard</div>
+<div class="f5-step-desc">Antes de arrastrar nodos de visualización, hay que crear una <span class="f5-tt"><strong>Tab</strong><span class="f5-tt-box">Pestaña del dashboard. Organiza los widgets en secciones navegables dentro del panel de visualización.</span></span> y al menos un <span class="f5-tt"><strong>Group</strong><span class="f5-tt-box">Agrupación de widgets dentro de una pestaña. Los nodos ui_gauge, ui_text y similares deben pertenecer a un grupo para aparecer en el dashboard.</span></span>. Sin grupo, los nodos ui_* no se muestran en el panel.</div>
+</div>
+</div>
+<div class="f5-step">
+<div class="f5-step-num">2</div>
+<div class="f5-step-body">
+<div class="f5-step-title">Arrastrar un nodo mqtt-in al espacio de trabajo</div>
+<div class="f5-step-desc">Configurar el broker (IP y puerto 1883) y el tópico del proyecto. Comprobar que el estado del nodo cambia a "conectado" en la parte inferior.</div>
+</div>
+</div>
+<div class="f5-step">
+<div class="f5-step-num">3</div>
+<div class="f5-step-body">
+<div class="f5-step-title">Añadir nodo JSON y nodo debug</div>
+<div class="f5-step-desc">Conectar mqtt-in → json → debug. Hacer Deploy y observar el panel de debug: debe aparecer el objeto con los bloques <code>esp</code> y <code>sensor</code>. Si llega como texto sin parsear, el nodo JSON lo convierte en objeto accesible.</div>
+</div>
+</div>
+<div class="f5-step">
+<div class="f5-step-num">4</div>
+<div class="f5-step-body">
+<div class="f5-step-title">Extraer variables con nodos function</div>
+<div class="f5-step-desc">Conectar un nodo function para cada variable: temperatura, presión, altitud. Cada función extrae un valor del JSON y lo asigna a msg.payload para pasarlo al widget correspondiente.</div>
+</div>
+</div>
+<div class="f5-step">
+<div class="f5-step-num">5</div>
+<div class="f5-step-body">
+<div class="f5-step-title">Conectar nodos ui_gauge y ui_text</div>
+<div class="f5-step-desc">Arrastrar un gauge para temperatura (rango 0–50°C), un text para presión y un text para altitud. Asignar cada uno al grupo del dashboard creado en el paso 1. Hacer Deploy.</div>
+</div>
+</div>
+<div class="f5-step">
+<div class="f5-step-num">6</div>
+<div class="f5-step-body">
+<div class="f5-step-title">Abrir el dashboard y comprobar en tiempo real</div>
+<div class="f5-step-desc">Navegar a <code>http://localhost:1880/ui</code> o usar el botón de acceso rápido del panel lateral. Los datos del sensor deben actualizarse automáticamente cada vez que el ESP8266 publica un mensaje.</div>
+</div>
+</div>
+</div>
+<!-- SCREENSHOTS DEL FLUJO -->
+<div class="f5-section-title"><span>📸</span> Capturas del proceso <span class="f5-badge">Imágenes reales del proyecto</span></div>
+<div class="f5-gallery">
+<div class="f5-screenshot"><a href="https://raw.githubusercontent.com/DaniCampusIoT/ESP8266-BMP280-MQTT-JSON-Proyecto-1-Bachillerato/main/img/flow_basico.png" rel="lightbox" title="Flujo básico: mqtt-in, json y debug"> <img src="https://raw.githubusercontent.com/DaniCampusIoT/ESP8266-BMP280-MQTT-JSON-Proyecto-1-Bachillerato/main/img/flow_basico.png" alt="Flujo básico en Node-RED" loading="lazy" /> </a>
+<div class="f5-screenshot-caption"><strong>Flujo básico</strong> <span>Primer flujo funcional: mqtt-in recibe los datos, json los parsea y debug los muestra en el panel lateral.</span></div>
+</div>
+<div class="f5-screenshot"><a href="debug_temp.png" rel="lightbox" title="Panel de debug con datos reales"><img src="debug_temp.png" alt="Panel de debug con datos del sensor" width="1661" height="667" /></a>
+<div class="f5-screenshot-caption"><strong>Debug con datos reales</strong> <span>El panel de debug muestra el objeto JSON completo con los bloques esp y sensor recibidos desde el ESP8266.</span></div>
+</div>
+<div class="f5-screenshot"><a href="https://raw.githubusercontent.com/DaniCampusIoT/ESP8266-BMP280-MQTT-JSON-Proyecto-1-Bachillerato/main/img/flow_con_gauge.png" rel="lightbox" title="Flujo con gauge de temperatura"> <img src="https://raw.githubusercontent.com/DaniCampusIoT/ESP8266-BMP280-MQTT-JSON-Proyecto-1-Bachillerato/main/img/flow_con_gauge.png" alt="Flujo con nodo ui_gauge para temperatura" loading="lazy" /> </a>
+<div class="f5-screenshot-caption"><strong>Flujo con gauge</strong> <span>Se añade el nodo function que extrae la temperatura y lo conecta al ui_gauge del dashboard.</span></div>
+</div>
+<div class="f5-screenshot"><a href="https://raw.githubusercontent.com/DaniCampusIoT/ESP8266-BMP280-MQTT-JSON-Proyecto-1-Bachillerato/main/img/flow_2.png" rel="lightbox" title="Flujo completo con textos y gauge"> <img src="https://raw.githubusercontent.com/DaniCampusIoT/ESP8266-BMP280-MQTT-JSON-Proyecto-1-Bachillerato/main/img/flow_2.png" alt="Flujo completo con gauge y textos" loading="lazy" /> </a>
+<div class="f5-screenshot-caption"><strong>Flujo avanzado</strong> <span>Flujo más completo con múltiples ramas: temperatura al gauge, presión y altitud a nodos de texto.</span></div>
+</div>
+</div>
+<!-- RUTAS JSON -->
+<div class="f5-section-title"><span>🗺️</span> Rutas de acceso al JSON <span class="f5-badge">Referencia rápida</span></div>
+<div class="f5-card" style="margin-bottom: 22px;">
+<h3><span class="f5-icon">📍</span>Acceso a variables en Node-RED</h3>
+<p>Una vez que el nodo JSON parsea el payload, puedes acceder a cada variable usando la ruta completa dentro del objeto. Estos son los accesos que debes usar en los nodos function del proyecto:</p>
+<div class="f5-json-route">
+<pre><span class="f5-route-comment">// Temperatura en grados Celsius</span>
+<span class="f5-route-path">msg.payload.sensor.temperatura_c</span>
+
+<span class="f5-route-comment">// Presión en hectopascales</span>
+<span class="f5-route-path">msg.payload.sensor.presion_hpa</span>
+
+<span class="f5-route-comment">// Altitud estimada en metros</span>
+<span class="f5-route-path">msg.payload.sensor.altitud_m</span>
+
+<span class="f5-route-comment">// IP del dispositivo (para diagnóstico)</span>
+<span class="f5-route-path">msg.payload.esp.ip</span>
+
+<span class="f5-route-comment">// Ejemplo de uso en un nodo function:</span>
+<span class="f5-route-key">msg.payload</span> = msg.payload.sensor.temperatura_c;
+return msg;</pre>
+</div>
+</div>
+<!-- DASHBOARD FINAL -->
+<div class="f5-section-title"><span>🎯</span> Resultado final: el dashboard <span class="f5-badge">Producto del proyecto</span></div>
+<div class="f5-dashboard-preview"><a href="https://raw.githubusercontent.com/DaniCampusIoT/ESP8266-BMP280-MQTT-JSON-Proyecto-1-Bachillerato/main/img/DASHBOARD.png" rel="lightbox" title="Dashboard final del proyecto"> <img src="https://raw.githubusercontent.com/DaniCampusIoT/ESP8266-BMP280-MQTT-JSON-Proyecto-1-Bachillerato/main/img/DASHBOARD.png" alt="Panel de visualización final del proyecto en Node-RED Dashboard" loading="lazy" /> </a>
+<div class="f5-dashboard-badge">📊 Dashboard final del proyecto</div>
+</div>
+<!-- GITHUB REF -->
+<div class="f5-github-text"><span style="color: #000000;">Código fuente, imágenes, flujos de Node-RED y documentación · github.com/DaniCampusIoT</span></div>
+<div class="f5-github-arrow">→</div>
+<!-- ADVERTENCIA UNDEFINED -->
+<div class="f5-warn"><strong>⚠️ Error frecuente — undefined en el dashboard:</strong> si el gauge o el texto muestra <code>undefined</code>, significa que la ruta de acceso al JSON no es correcta. Comprueba que el nodo JSON ha parseado el payload antes del nodo function y que la ruta coincide exactamente con la estructura del mensaje recibido. Puedes ver la imagen de diagnóstico en el repositorio del proyecto.</div>
+</div>
+</div></div>
+</div>
+</div>
+</article>
+<div id="packageLicense" class="cc cc-by-sa">
+<p><span>Obra publicada con</span> <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Licencia Creative Commons Reconocimiento Compartir igual 4.0</a></p>
+</div>
+</section>
+</div>
+<div id='bottomPagination'>
+<nav class="pagination noprt">
+<a href="fase_4_envo_de_datos_va_mqtt.html" class="prev"><span><span>&laquo; </span>Anterior</span></a> <span class="sep">| </span><a href="fase_6_anlisis_reflexin_y_entrega.html" class="next"><span>Siguiente<span> &raquo;</span></span></a>
+</nav>
+</div>
+<footer id="siteFooter">Daniel Rodríguez Carrión | REA para Tecnología e Ingeniería | Curso 2025-2026 | Licencia CC </footer></div>
+<p id="made-with-eXe"><a href="https://exelearning.net/" target="_blank" rel="noopener"><span>Creado con eXeLearning<span> (Ventana nueva)</span></span></a></p><script type="text/javascript" src="_intef_js.js"></script></body></html>
